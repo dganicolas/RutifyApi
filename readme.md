@@ -50,6 +50,9 @@ classDiagram
     Usuarios --> Gimnasios : registra
     Usuarios --> Estadisticas : tiene
     Usuarios --> Pesos : registra
+    Cursos --> Leccion : contiene
+    Usuarios --> Compras : realiza
+    Cursos --> Compras : es comprado
     
     class Usuarios{
         + _id: ObjectId
@@ -114,18 +117,47 @@ classDiagram
     
     class Estadisticas {
         + _id: ObjectId
-        + usuarioId: ObjectId
-        + grupoMuscular: String
-        + nivel: Int
-        + puntosTotales: Int
+        + UsuarioId: ObjectId
+        + LvlBrazo: Float
+        + LvlPecho: Float
+        + LvlEspalda: Float
+        + LvlPiernas: Float
+        + ejerciciosRealizados: Int
         + caloriasQuemadas: Float
     }
 
     class Pesos {
         + _id: ObjectId
-        + usuarioId: ObjectId
-        + peso: Float
-        + timestamp: Date
+        + UsuarioId: ObjectId
+        + Peso: Float
+        + Fecha: Date
+    }
+    
+    class Compras {
+        + _id: ObjectId
+        + id_usuario: ObjectId
+        + id_curso: ObjectId
+        + fecha_compra: Date
+        + estado: String
+    }
+
+    class Cursos {
+        + _id: ObjectId
+        + titulo: String
+        + descripcion: String
+        + precio: Float
+        + autor: ObjectId
+        + contenido: List<Leccion>
+        + fecha_creacion: Date
+        + duracion_aproximada: String
+        + nivel: String
+        + imagen_portada: String
+    }
+
+    class Leccion {
+        + titulo: String
+        + descripcion: String
+        + video_url: String
     }
 
 ```
