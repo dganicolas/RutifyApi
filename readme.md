@@ -48,6 +48,8 @@ classDiagram
     Rutinas --> Valoracion : tiene un subdocumento
     Gimnasios --> Rutinas : ofrece
     Usuarios --> Gimnasios : registra
+    Usuarios --> Estadisticas : tiene
+    Usuarios --> Pesos : registra
     
     class Usuarios{
         + _id: ObjectId
@@ -109,6 +111,23 @@ classDiagram
         + Comentario: String
         + Fecha: Date
     }
+    
+    class Estadisticas {
+        + _id: ObjectId
+        + usuarioId: ObjectId
+        + grupoMuscular: String
+        + nivel: Int
+        + puntosTotales: Int
+        + caloriasQuemadas: Float
+    }
+
+    class Pesos {
+        + _id: ObjectId
+        + usuarioId: ObjectId
+        + peso: Float
+        + timestamp: Date
+    }
+
 ```
 
 - Función
