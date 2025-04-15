@@ -46,6 +46,8 @@ classDiagram
     Rutinas -->  Comentarios: contiene
     Usuarios --> Comentarios : deja
     Rutinas --> Valoracion : tiene un subdocumento
+    Gimnasios --> Rutinas : ofrece
+    Usuarios --> Gimnasios : registra
     
     class Usuarios{
         + _id: ObjectId
@@ -68,6 +70,7 @@ classDiagram
         + Valoracion: Valoracion
         + esPremium: Boolean
         + Autor: ObjectId
+        + GimnasioId: ObjectId
     }
 
     class Votos{
@@ -87,6 +90,16 @@ classDiagram
         + PuntoGanados: Int
         + CaloriasQuemadas: Float
         + GrupoMuscular: String
+    }
+    
+    class Gimnasios {
+        +_id: ObjectId
+        +Nombre: String
+        +Direccion: String
+        +Descripcion: String
+        +RegistradoPor: ObjectId
+        +FechaRegistro: Date
+        +EsPremium: Boolean
     }
     
     class Comentarios{
