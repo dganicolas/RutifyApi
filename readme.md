@@ -55,6 +55,7 @@ classDiagram
     Usuarios --> Planning : adquieren 
     Usuarios --> Compras : realiza
     Compras --> Planning : compra
+    Pesos --> Estadisticas : visualiza su peso
     
     class Usuarios{
         + _id: ObjectId
