@@ -47,12 +47,13 @@ classDiagram
     Usuarios --> Comentarios : deja
     Rutinas --> Valoracion : tiene un subdocumento
     Gimnasios --> Rutinas : ofrece
+    Gimnasios --> Usuarios : autoriza a ver sus rutinas
     Usuarios --> Gimnasios : registra
     Usuarios --> Estadisticas : tiene
     Usuarios --> Pesos : registra
     Planning --> Etapa : contiene
-    Planning --> Compras : realiza
-    Planning --> Compras : es comprado
+    Usuarios --> Planning : adquieren 
+    Usuarios --> Compras : realiza compras
     
     class Usuarios{
         + _id: ObjectId
@@ -61,8 +62,10 @@ classDiagram
         + Edad: Int
         + Nombre: String
         + Correo: String
+        + gimnasio_id: ObjectId?
         + esPremium: Boolean
     }
+    
     class Valoracion{
         - votantes: Int
         - puntos: Int
