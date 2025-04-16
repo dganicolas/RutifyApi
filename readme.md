@@ -50,9 +50,9 @@ classDiagram
     Usuarios --> Gimnasios : registra
     Usuarios --> Estadisticas : tiene
     Usuarios --> Pesos : registra
-    Cursos --> Leccion : contiene
-    Usuarios --> Compras : realiza
-    Cursos --> Compras : es comprado
+    Planning --> Etapa : contiene
+    Planning --> Compras : realiza
+    Planning --> Compras : es comprado
     
     class Usuarios{
         + _id: ObjectId
@@ -141,23 +141,23 @@ classDiagram
         + estado: String
     }
 
-    class Cursos {
+    class Planning {
         + _id: ObjectId
         + titulo: String
         + descripcion: String
         + precio: Float
         + autor: ObjectId
-        + contenido: List<Leccion>
+        + contenido: List<Etapa>
         + fecha_creacion: Date
         + duracion_aproximada: String
         + nivel: String
         + imagen_portada: String
     }
 
-    class Leccion {
+    class Etapa {
         + titulo: String
         + descripcion: String
-        + video_url: String
+        + Contenido: List<Rutinas>
     }
 
 ```
