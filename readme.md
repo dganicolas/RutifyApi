@@ -53,7 +53,8 @@ classDiagram
     Usuarios --> Pesos : registra
     Planning --> Etapa : contiene
     Usuarios --> Planning : adquieren 
-    Usuarios --> Compras : realiza compras
+    Usuarios --> Compras : realiza
+    Compras --> Planning : compra
     
     class Usuarios{
         + _id: ObjectId
