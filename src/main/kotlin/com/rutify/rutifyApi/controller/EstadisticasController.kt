@@ -1,0 +1,54 @@
+package com.rutify.rutifyApi.controller
+
+import com.rutify.rutifyApi.domain.Estadisticas
+import com.rutify.rutifyApi.service.EstadisticasService
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.ResponseEntity
+import org.springframework.security.core.Authentication
+import org.springframework.web.bind.annotation.*
+
+@RestController
+@RequestMapping("/v1/estadisticas")
+class EstadisticasController {
+    @Autowired
+    private lateinit var estadisticasService: EstadisticasService
+
+    @PostMapping("/crear")
+    fun crearEstadisticas(
+        @RequestBody estadisticas: Estadisticas,
+        authentication: Authentication,
+    ): ResponseEntity<Estadisticas> {
+        return estadisticasService.crearEstadisticas(estadisticas, authentication)
+    }
+
+    @GetMapping("/{usuarioId}")
+    fun obtenerEstadisticas(@PathVariable usuarioId: String): ResponseEntity<Estadisticas> {
+        return estadisticasService.obtenerEstadisticasPorUsuarioId(usuarioId)
+    }
+
+    @PutMapping("/{usuarioId}")
+    fun actualizarEstadisticas(
+        @PathVariable usuarioId: String,
+        @RequestBody estadisticasActualizadas: Estadisticas,
+        authentication: Authentication,
+    ): ResponseEntity<Estadisticas> {
+        return estadisticasService.actualizarEstadisticas(usuarioId, estadisticasActualizadas, authentication)
+    }
+
+    @PutMapping("/reiniciar/{usuarioId}")
+    fun reiniciarEstadisticas(
+        @PathVariable usuarioId: String,
+        authentication: Authentication,
+    ): ResponseEntity<Estadisticas> {
+        return estadisticasService.reiniciarEstadisticas(usuarioId, authentication)
+    }
+
+    @DeleteMapping("/{usuarioId}")
+    fun eliminarEstadisticas(
+        @PathVariable usuarioId: String,
+        authentication: Authentication,
+    ): ResponseEntity<Void> {
+        return estadisticasService.eliminarEstadisticasPorUsuarioId(usuarioId, authentication)
+    }
+
+}

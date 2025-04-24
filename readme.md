@@ -16,13 +16,14 @@ dateFormat  DD-MM-YYYY
 title       Diagrama temporal de la api   
 section Acciones
 
-    Creacion del proyecto: des1, 09-04-2024,1d
+    Creacion del proyecto: 1, 09-04-2024,1d
 
-    Creo plan de desarrollo en trello: des2, 09-04-2024,1d
+    Creo plan de desarrollo en trello: 2, 09-04-2024,1d
 
-    mejoro la interfaz en figma: des3, 09-04-2024,1d
-    Popular la base de datos : des4, 11-04-2024,1d
-    Defino las entidades: des3, 15-04-2024,1d
+    mejoro la interfaz en figma: 3, 09-04-2024,1d
+    Popular la base de datos : 4, 11-04-2024,1d
+    Defino las entidades: 5, 15-04-2024,1d
+    controlador Usuarios realizados, 6, 19/04/2025, 5d
 
     entrega de proyecto: milestone final, 15-06-2024,1d
 section errores encontrados
@@ -70,6 +71,7 @@ classDiagram
         - votantes: Int
         - puntos: Int
     }
+    
     class Rutinas{
         + _id: ObjectId 67f95a5948edc7419a030d1e
         + Nombre: String "Entrena tu espalda"
@@ -87,6 +89,7 @@ classDiagram
         + Id_rutina: ObjectId
         + puntuacion: Int
     }
+    
     class Ejercicios{
         + _id: ObjectId
         + Nombre : String
@@ -214,12 +217,18 @@ architecture-beta
 ## funcionalidades
 
 ### funcionalidades realizadas:
-
-### Futuras funcionalidades:
 - el usuario se puede registrar e iniciar sesion en mi plataforma
+  - mediante firebase, me da la autenticacion y seguridad 
+### Futuras funcionalidades:
+
 - el usuario puede puntuar de 1 a 5 estrellas las rutinas que el haya hecho
 - el usuario podra escribir articulos en mi plataforma
 - el usuario podra crear sus propias rutinas y compartirlas(usuario de pago)
 - el usuario podra hacer amigos dentro de la app
 - el usuario podra tener ejercicios favoritos guardados localmente
-- 
+
+
+# apuntes
+
+el Ifirebase, sera mi clave maestra
+las stas se guardan con el id de firebase que se guarda en mongo tmb

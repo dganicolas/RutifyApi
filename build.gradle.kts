@@ -4,7 +4,7 @@ plugins {
 	war
 	id("org.springframework.boot") version "3.4.4"
 	id("io.spring.dependency-management") version "1.1.7"
-	kotlin("plugin.jpa") version "1.9.25"
+	//	kotlin("plugin.jpa") version "1.9.25"
 }
 
 group = "com.rutify"
@@ -28,8 +28,9 @@ repositories {
 }
 
 dependencies {
-	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+	//implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
+	implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
@@ -38,10 +39,21 @@ dependencies {
 	providedRuntime("org.springframework.boot:spring-boot-starter-tomcat")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
+	testImplementation("org.mockito:mockito-core:5.5.0")
+	testImplementation("org.mockito:mockito-junit-jupiter:5.5.0")
+	testImplementation("org.mockito.kotlin:mockito-kotlin:5.1.0")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-	implementation("com.google.firebase:firebase-admin:9.4.3") // Firebase Admin SDK
+
+	implementation("com.google.firebase:firebase-admin:9.4.3")
 	implementation("com.google.firebase:firebase-firestore:25.1.3")
-	implementation("com.fasterxml.jackson.core:jackson-databind:2.13.4.2") // JSON
+
+	implementation("org.mongodb:mongodb-driver-kotlin-sync:5.3.0")
+	implementation("org.springframework.boot:spring-boot-starter-webflux")
+
+	implementation("com.google.protobuf:protobuf-java:4.28.2")
+	implementation("io.grpc:grpc-netty-shaded:1.63.0")
+	implementation("io.grpc:grpc-protobuf:1.63.0")
+	implementation("io.grpc:grpc-stub:1.63.0")
 }
 
 kotlin {
