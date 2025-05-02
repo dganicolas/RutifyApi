@@ -16,7 +16,7 @@ class UsuariosController(private val db: Firestore) {
     private lateinit var usuariosService: UsuariosService
 
     @PostMapping("/registrarse")
-    fun registrarUsuario(@RequestBody usuario: UsuarioRegisterDTO): ResponseEntity<UsuarioregistradoDto> {
+    fun registrarUsuario(@RequestBody usuario: UsuarioRegistroDTO): ResponseEntity<UsuarioregistradoDto> {
         return usuariosService.registrarUsuario(usuario)
     }
 
@@ -34,21 +34,22 @@ class UsuariosController(private val db: Firestore) {
         return usuariosService.eliminarUsuarioPorCorreo(correo, authentication)
     }
 
-    @GetMapping("/buscar/usuarios/{nombre}")
+    @GetMapping("/buscar/{nombre}")
     fun buscarUsuariosPorNombre(@PathVariable nombre: String): ResponseEntity<List<UsuarioBusquedaDto>> {
         return usuariosService.buscarUsuariosPorNombre(nombre)
     }
 
     @GetMapping("/detalle/{idFirebase}")
-    fun obtenerDetalleUsuario(@PathVariable idFirebase: String): ResponseEntity<UsuarioInformacionDto> {
+    fun obtenerDetalleUsuario(@PathVariable idFirebase: String,authentication: Authentication ): ResponseEntity<UsuarioInformacionDto> {
         return usuariosService.obtenerDetalleUsuario(idFirebase)
     }
 
     @PutMapping("/actualizar/{correo}")
     fun actualizarCorreo(
         @PathVariable correo: String,
-        authentication: Authentication
-    ) {
-
+        authentication: Authentication,
+        @RequestBody actualizarUsuarioDTO: ActualizarUsuarioDTO
+    ): ResponseEntity<ActualizarUsuarioDTO> {
+        return usuariosService.actualizarCuenta(correo,authentication,actualizarUsuarioDTO)
     }
 }

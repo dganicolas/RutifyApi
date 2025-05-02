@@ -7,5 +7,6 @@ data class UsuarioInformacionDto(
     val sexo: String,
     val esPremium: Boolean,
     val avatarUrl: String,
-    val estadisticas: EstadisticasDto
+    val estadisticas: EstadisticasDto,
+    val countRutinas: Long
 )

@@ -1,7 +1,7 @@
 package com.rutify.rutifyApi.dto
 
 
-data class UsuarioRegisterDTO(
+data class UsuarioRegistroDTO(
     var sexo: String,
     var edad: Int,
     var nombre: String,

@@ -15,7 +15,9 @@ import com.rutify.rutifyApi.exception.exceptions.NotFoundException
 import com.rutify.rutifyApi.exception.exceptions.UnauthorizedException
 import com.rutify.rutifyApi.exception.exceptions.ValidationException
 import com.rutify.rutifyApi.repository.IEstadisticasRepository
+import com.rutify.rutifyApi.repository.IRutinasRepository
 import com.rutify.rutifyApi.repository.IUsuarioRepository
+import com.rutify.rutifyApi.utils.AuthUtils
 import com.rutify.rutifyApi.utils.DTOMapper
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -42,14 +44,7 @@ class UsuariosService {
     @Value("\${firebase.apikey}")
     lateinit var apiKey: String
 
-    @Autowired
-    lateinit var firebaseAuth: FirebaseAuth
-
-    @Autowired
-    lateinit var httpClient: HttpClient
-
-
-    fun registrarUsuario(usuario: UsuarioRegisterDTO): ResponseEntity<UsuarioregistradoDto> {
+    fun registrarUsuario(usuario: UsuarioRegistroDTO): ResponseEntity<UsuarioregistradoDto> {
         return try {
             val error = validarUsuarioRegistro(usuario)
             if (error != null) {
@@ -58,7 +53,7 @@ class UsuariosService {
             val request = UserRecord.CreateRequest()
                 .setEmail(usuario.correo)
                 .setPassword(usuario.contrasena)
-            val userRecord = firebaseAuth.createUser(request)
+            val userRecord = FirebaseAuth.getInstance().createUser(request)
 
             // Crear un documento de usuario en Firestore con su rol
             val usuarioFirebase = UsuarioFirebase(
@@ -144,18 +139,16 @@ class UsuariosService {
         if (querySnapshot.isEmpty) {
             throw NotFoundException("Usuario con correo $correo no encontrado.")
         }
-
         val usuarioFirebase = querySnapshot.documents[0].toObject(UsuarioFirebase::class.java)
-        val usuarioEsElMismo = usuarioFirebase.IdFirebase == uidActual
-        val usuarioEsAdmin = (usuarioFirebase.Rol) == ("Admin")
 
-        if (!usuarioEsElMismo && !usuarioEsAdmin) {
-            throw UnauthorizedException("No tienes permisos para eliminar este usuario.")
-        }
+        AuthUtils.verificarPermisos(usuarioFirebase,uidActual)
 
         eliminarDeFirestore(usuarioFirebase.IdFirebase)
         eliminarDeMongoDb(correo)
     }
+
+    @Autowired
+    lateinit var rutinaRepository: IRutinasRepository
 
     fun obtenerDetalleUsuario(idFirebase: String): ResponseEntity<UsuarioInformacionDto> {
         val usuario = usuarioRepository.findByIdFirebase(idFirebase)
@@ -163,9 +156,9 @@ class UsuariosService {
         val estadisticas = estadisticasRepository.findByIdFirebase(idFirebase) ?:
         Estadisticas(null,"",0f, 0f, 0f, 0f, 0, 0f)
 
-        if (!usuario.perfilPublico) {
-            // Si el perfil es privado y el usuario autenticado no es el propio usuario
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
+        val totalRutinas = rutinaRepository.countByCreadorId(idFirebase)
+        if (usuario.perfilPublico) {
+            return ResponseEntity.ok(
                 UsuarioInformacionDto(
                     idFirebase = usuario.idFirebase,
                     nombre = usuario.nombre,
@@ -173,7 +166,8 @@ class UsuariosService {
                     sexo = usuario.sexo,
                     esPremium = usuario.esPremium,
                     avatarUrl = usuario.avatar,
-                    estadisticas = DTOMapper.estadisticasToEstadisticasDto(estadisticas)
+                    estadisticas = DTOMapper.estadisticasToEstadisticasDto(estadisticas),
+                    countRutinas = totalRutinas
                 )
             )
         }else{
@@ -214,7 +208,7 @@ class UsuariosService {
     }
 
 
-    private fun validarUsuarioRegistro(usuario: UsuarioRegisterDTO): String? {
+    private fun validarUsuarioRegistro(usuario: UsuarioRegistroDTO): String? {
 
         if (usuario.nombre.isBlank()) {
             return "El nombre no puede estar vacío"
@@ -245,7 +239,31 @@ class UsuariosService {
         return null
     }
 
+    fun actualizarCuenta(correo: String, authentication: Authentication, actualizarUsuarioDTO: ActualizarUsuarioDTO):ResponseEntity<ActualizarUsuarioDTO> {
+        // Obtener el usuario autenticado (si es necesario hacer validación adicional)
+        val usuarioAutenticado = authentication.name  // Si usas el correo del usuario autenticado
 
+        // Comprobar si el correo del path corresponde al correo del usuario autenticado
+        if (usuarioAutenticado != correo) {
+            throw UnauthorizedException("No tienes permiso para actualizar este perfil.")
+        }
+
+        // Buscar el usuario por correo
+        val usuario = usuarioRepository.findByCorreo(correo)
+            ?: throw NotFoundException("Usuario no encontrado")
+
+        // Actualizar los campos que se permiten
+        usuario.nombre = actualizarUsuarioDTO.nombre ?: usuario.nombre
+        usuario.sexo = actualizarUsuarioDTO.sexo ?: usuario.sexo
+        usuario.edad = actualizarUsuarioDTO.edad ?: usuario.edad
+        usuario.perfilPublico = actualizarUsuarioDTO.perfilPublico ?: usuario.perfilPublico
+        usuario.avatar = actualizarUsuarioDTO.avatar ?: usuario.avatar
+
+        // Guardar el usuario actualizado
+        usuarioRepository.save(usuario)
+
+        return ResponseEntity.ok(actualizarUsuarioDTO)
+    }
 
 
 }

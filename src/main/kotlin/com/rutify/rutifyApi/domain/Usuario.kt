@@ -20,7 +20,7 @@ data class Usuario(
     @Field
     var gimnasioId: ObjectId? = null,
     @Field
-    val avatar: String = "",
+    var avatar: String = "",
     @Field
     var esPremium: Boolean,
     @Field
