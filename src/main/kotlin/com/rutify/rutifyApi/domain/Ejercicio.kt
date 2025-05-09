@@ -8,7 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Field
 @Document(collection = "Ejercicios")
 data class Ejercicio(
     @Id
-    val id: ObjectId? = null,
+    val id: String,
     @Field
     val nombreEjercicio: String,
     @Field

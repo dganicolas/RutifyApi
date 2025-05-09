@@ -11,11 +11,13 @@ data class Rutina(
     @Field
     val nombre: String,
     @Field
+    val imagen:String,
+    @Field
     val descripcion: String,
     @Field
     val creadorId: String,
     @Field
-    val ejercicios: List<Ejercicio>, // IDs de ejercicios asociados
+    val ejercicios: Map<String,Int>, // IDs de ejercicios asociados junto con sus repeticiones
     @Field
     val esPremium: Boolean,
     @Field

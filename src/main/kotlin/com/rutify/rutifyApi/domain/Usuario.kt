@@ -4,6 +4,7 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.Field
 import org.bson.types.ObjectId
+import java.time.LocalDate
 
 @Document(collection = "Usuarios")
 data class Usuario(
@@ -12,7 +13,7 @@ data class Usuario(
     @Field
     var sexo: String,
     @Field
-    var edad: Int,
+    var fechaNacimiento: LocalDate,
     @Field
     var nombre: String,
     @Field
@@ -24,5 +25,7 @@ data class Usuario(
     @Field
     var esPremium: Boolean,
     @Field
-    var perfilPublico: Boolean = true
+    var perfilPublico: Boolean = true,
+    @Field
+    var rol:String
 )

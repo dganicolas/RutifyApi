@@ -8,7 +8,6 @@ import com.google.firebase.auth.UserRecord
 import com.rutify.rutifyApi.domain.Estadisticas
 import com.rutify.rutifyApi.domain.FirebaseLoginResponse
 import com.rutify.rutifyApi.domain.Usuario
-import com.rutify.rutifyApi.domain.UsuarioFirebase
 import com.rutify.rutifyApi.dto.*
 import com.rutify.rutifyApi.exception.exceptions.FirebaseUnavailableException
 import com.rutify.rutifyApi.exception.exceptions.NotFoundException
@@ -21,6 +20,9 @@ import com.rutify.rutifyApi.utils.AuthUtils
 import com.rutify.rutifyApi.utils.DTOMapper
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.Authentication
@@ -29,6 +31,8 @@ import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
+import java.time.LocalDate
+import java.time.Period
 
 @Service
 class UsuariosService {
@@ -40,6 +44,9 @@ class UsuariosService {
 
     @Autowired
     lateinit var db: Firestore
+
+    @Autowired
+    lateinit var rutinaRepository: IRutinasRepository
 
     @Value("\${firebase.apikey}")
     lateinit var apiKey: String
@@ -55,36 +62,53 @@ class UsuariosService {
                 .setPassword(usuario.contrasena)
             val userRecord = FirebaseAuth.getInstance().createUser(request)
 
-            // Crear un documento de usuario en Firestore con su rol
-            val usuarioFirebase = UsuarioFirebase(
-                IdFirebase = userRecord.uid,
-                Nombre = usuario.nombre,
-                Email = usuario.correo,
-                Rol = "user",
-            )
-
-            // Guardar el usuario en Firestore
-            db.collection("Usuarios")
-                .document(userRecord.uid)
-                .set(usuarioFirebase)
-
             val nuevoUsuario = Usuario(
                 idFirebase = userRecord.uid,
                 nombre = usuario.nombre,
-                edad = usuario.edad,
+                fechaNacimiento = usuario.fechaNacimiento,
                 sexo = usuario.sexo,
                 correo = usuario.correo,
                 gimnasioId = null,
-                esPremium = false
+                esPremium = false,
+                rol = "user"
             )
 
             usuarioRepository.save(nuevoUsuario)
-
             ResponseEntity(DTOMapper.usuarioRegisterDTOToUsuarioProfileDto(nuevoUsuario), HttpStatus.OK)
         } catch (e: FirebaseAuthException) {
             e.printStackTrace()
             throw FirebaseUnavailableException("Error con Firebase: ${e.message}")
         }
+    }
+
+    private fun validarUsuarioRegistro(usuario: UsuarioRegistroDTO): String? {
+
+        if (usuario.nombre.isBlank()) {
+            return "El nombre no puede estar vacío"
+        }
+
+        if (!usuario.correo.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$".toRegex())) {
+            return "El correo no es valido"
+        }
+
+        if (usuario.contrasena.isBlank() ||
+            usuario.contrasena.length < 6
+        ) {
+            return "La contraseña debe tener al menos 6 caracteres y contener al menos un número"
+        }
+
+        if (Period.between(usuario.fechaNacimiento, LocalDate.now()).years < 16) {
+            return "La edad no puede ser menor a 16 años"
+        }
+
+        if (usuario.sexo != "H" && usuario.sexo != "M") {
+            return "El sexo debe ser 'H' (hombre) o 'M' (mujer')"
+        }
+
+        if (usuarioRepository.findByCorreo(usuario.correo) != null) {
+            return "El correo ya está registrado"
+        }
+        return null
     }
 
     fun loginUsuarios(login: UsuarioCredencialesDto): ResponseEntity<UsuarioLoginDto> {
@@ -106,58 +130,54 @@ class UsuariosService {
 
         val token = client.send(request, HttpResponse.BodyHandlers.ofString())
 
-        val querySnapshot = db.collection("Usuarios")
-            .whereEqualTo("email", login.correo)
-            .get()
-            .get()
-
-        if (querySnapshot.isEmpty) {
-            throw NotFoundException("Usuario no encontrado en Firestore")
-        }
-
-        val document = querySnapshot.documents[0]
-        val nombre = document.getString("nombre") ?: "Usuario"
 
         if (token.statusCode() == 200) {
             val firebaseResponse = ObjectMapper().readValue(token.body(), FirebaseLoginResponse::class.java)
-            return ResponseEntity.ok(UsuarioLoginDto(nombre = nombre, token = firebaseResponse.idToken))
+            val usuario = usuarioRepository.findByIdFirebase(firebaseResponse.localId)
+
+            return ResponseEntity.ok(UsuarioLoginDto(nombre = usuario!!.nombre, token = firebaseResponse.idToken))
         } else {
             val errorBody = token.body()
             throw UnauthorizedException("Credenciales incorrectas: $errorBody")
         }
     }
 
-    fun eliminarUsuarioPorCorreo(correo: String, authentication: Authentication) {
+    fun eliminarUsuarioPorCorreo(correo: String, authentication: Authentication): ResponseEntity<Void> {
         val uidActual = authentication.name // UID desde el JWT
 
         // Buscar en Firebase Firestore por correo
-        val querySnapshot = db.collection("Usuarios")
-            .whereEqualTo("email", correo)
-            .get()
-            .get()
+        val usuario = usuarioRepository.findByCorreo(correo)
+            ?: throw NotFoundException("Usuario con correo $correo no encontrado.")
 
-        if (querySnapshot.isEmpty) {
-            throw NotFoundException("Usuario con correo $correo no encontrado.")
-        }
-        val usuarioFirebase = querySnapshot.documents[0].toObject(UsuarioFirebase::class.java)
+        AuthUtils.verificarPermisos(usuario,uidActual)
 
-        AuthUtils.verificarPermisos(usuarioFirebase,uidActual)
-
-        eliminarDeFirestore(usuarioFirebase.IdFirebase)
+        eliminarDeFirestore(usuario.idFirebase)
         eliminarDeMongoDb(correo)
+        return ResponseEntity.noContent().build()
     }
 
-    @Autowired
-    lateinit var rutinaRepository: IRutinasRepository
+    private fun eliminarDeFirestore(uidUsuarioABorrar: String) {
+        val autorizacion = FirebaseAuth.getInstance()
+        autorizacion.revokeRefreshTokens(uidUsuarioABorrar)
+        autorizacion.deleteUser(uidUsuarioABorrar)
+    }
 
-    fun obtenerDetalleUsuario(idFirebase: String): ResponseEntity<UsuarioInformacionDto> {
+    private fun eliminarDeMongoDb(correo: String) {
+        val usuario = usuarioRepository.findByCorreo(correo)
+        if (usuario != null) {
+            usuarioRepository.delete(usuario)
+        } else {
+            throw NotFoundException("Usuario con correo $correo no encontrado.")
+        }
+    }
+
+    fun obtenerDetalleUsuario(idFirebase: String, authentication: Authentication): ResponseEntity<UsuarioInformacionDto> {
         val usuario = usuarioRepository.findByIdFirebase(idFirebase)
             ?: throw NotFoundException("Usuario no encontrado")
         val estadisticas = estadisticasRepository.findByIdFirebase(idFirebase) ?:
         Estadisticas(null,"",0f, 0f, 0f, 0f, 0, 0f)
-
         val totalRutinas = rutinaRepository.countByCreadorId(idFirebase)
-        if (usuario.perfilPublico) {
+        if (usuario.perfilPublico || usuario.idFirebase == authentication.name) {
             return ResponseEntity.ok(
                 UsuarioInformacionDto(
                     idFirebase = usuario.idFirebase,
@@ -176,10 +196,11 @@ class UsuariosService {
 
     }
 
-    fun buscarUsuariosPorNombre(nombre: String): ResponseEntity<List<UsuarioBusquedaDto>> {
-        val lista = usuarioRepository.findByNombreContains(nombre)
-            .filter { it.perfilPublico }
-            .map {
+    fun buscarUsuariosPorNombre(nombre: String, pagina: Int, tamano: Int): ResponseEntity<BusquedaUsuariosRespuesta> {
+        val pageable: Pageable = PageRequest.of(pagina, tamano)
+        val paginaUsuarios = usuarioRepository.findByNombreContainsAndPerfilPublicoTrue(nombre, pageable)
+
+        val usuarios = paginaUsuarios.content.map {
             UsuarioBusquedaDto(
                 idFirebase = it.idFirebase,
                 nombre = it.nombre,
@@ -188,81 +209,60 @@ class UsuariosService {
                 avatar = it.avatar
             )
         }
-        return ResponseEntity.ok(lista)
-    }
 
-    private fun eliminarDeFirestore(uidUsuarioABorrar: String) {
-        val autorizacion = FirebaseAuth.getInstance()
-        autorizacion.revokeRefreshTokens(uidUsuarioABorrar)
-        autorizacion.deleteUser(uidUsuarioABorrar)
-        db.collection("Usuarios").document(uidUsuarioABorrar).delete()
-    }
-
-    private fun eliminarDeMongoDb(correo: String) {
-        val usuario = usuarioRepository.findByCorreo(correo)
-        if (usuario != null) {
-            usuarioRepository.delete(usuario)
-        } else {
-            throw NotFoundException("Usuario con correo $correo no encontrado.")
-        }
+        return ResponseEntity.ok(
+            BusquedaUsuariosRespuesta(
+                usuarios = usuarios,
+                hasNext = paginaUsuarios.hasNext()
+            )
+        )
     }
 
 
-    private fun validarUsuarioRegistro(usuario: UsuarioRegistroDTO): String? {
+    fun actualizarCuenta(authentication: Authentication, actualizarUsuarioDTO: ActualizarUsuarioDTO):ResponseEntity<ActualizarUsuarioDTO> {
 
-        if (usuario.nombre.isBlank()) {
-            return "El nombre no puede estar vacío"
-        }
-
-        if (!usuario.correo.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$".toRegex())) {
-            return "El correo no es valido"
-        }
-
-        if (usuario.contrasena.isBlank() ||
-            usuario.contrasena.length < 6 ||
-            !usuario.contrasena.any { it.isDigit() }
-        ) {
-            return "La contraseña debe tener al menos 6 caracteres y contener al menos un número"
-        }
-
-        if (usuario.edad < 0) {
-            return "La edad no puede ser negativa"
-        }
-
-        if (usuario.sexo != "H" && usuario.sexo != "M") {
-            return "El sexo debe ser 'H' (hombre) o 'M' (mujer')"
-        }
-
-        if (usuarioRepository.findByCorreo(usuario.correo) != null) {
-            return "El correo ya está registrado"
-        }
-        return null
-    }
-
-    fun actualizarCuenta(correo: String, authentication: Authentication, actualizarUsuarioDTO: ActualizarUsuarioDTO):ResponseEntity<ActualizarUsuarioDTO> {
-        // Obtener el usuario autenticado (si es necesario hacer validación adicional)
-        val usuarioAutenticado = authentication.name  // Si usas el correo del usuario autenticado
-
-        // Comprobar si el correo del path corresponde al correo del usuario autenticado
-        if (usuarioAutenticado != correo) {
-            throw UnauthorizedException("No tienes permiso para actualizar este perfil.")
-        }
-
+        val usuarioSolicitante = usuarioRepository.findByIdFirebase(authentication.name)
+            ?: throw NotFoundException("Usuario solicitante no encontrado")
         // Buscar el usuario por correo
-        val usuario = usuarioRepository.findByCorreo(correo)
+        val usuarioACambiar = usuarioRepository.findByCorreo(actualizarUsuarioDTO.correo)
             ?: throw NotFoundException("Usuario no encontrado")
 
-        // Actualizar los campos que se permiten
-        usuario.nombre = actualizarUsuarioDTO.nombre ?: usuario.nombre
-        usuario.sexo = actualizarUsuarioDTO.sexo ?: usuario.sexo
-        usuario.edad = actualizarUsuarioDTO.edad ?: usuario.edad
-        usuario.perfilPublico = actualizarUsuarioDTO.perfilPublico ?: usuario.perfilPublico
-        usuario.avatar = actualizarUsuarioDTO.avatar ?: usuario.avatar
+        if (usuarioSolicitante.rol == "admin" || usuarioACambiar.correo != actualizarUsuarioDTO.correo) {
+            throw UnauthorizedException("No tienes permiso para actualizar este perfil.")
+        }
+        val error = validarActualizarUsuarioDTO(actualizarUsuarioDTO)
+
+        if (error != null) {
+            throw ValidationException(error)
+        }
+
+
+        usuarioACambiar.nombre = actualizarUsuarioDTO.nombre ?: usuarioACambiar.nombre
+        usuarioACambiar.sexo = actualizarUsuarioDTO.sexo ?: usuarioACambiar.sexo
+        usuarioACambiar.fechaNacimiento = actualizarUsuarioDTO.fechaNacimiento ?: usuarioACambiar.fechaNacimiento
+        usuarioACambiar.perfilPublico = actualizarUsuarioDTO.perfilPublico ?: usuarioACambiar.perfilPublico
+        usuarioACambiar.avatar = actualizarUsuarioDTO.avatar ?: usuarioACambiar.avatar
 
         // Guardar el usuario actualizado
-        usuarioRepository.save(usuario)
+        usuarioRepository.save(usuarioACambiar)
 
         return ResponseEntity.ok(actualizarUsuarioDTO)
+    }
+
+    private fun validarActualizarUsuarioDTO(actualizarUsuarioDTO: ActualizarUsuarioDTO): String? {
+        actualizarUsuarioDTO.nombre?.let {
+            if (it.isBlank()) return "El nombre no puede estar vacío"
+        }
+
+        actualizarUsuarioDTO.fechaNacimiento?.let {
+            if (Period.between(it, LocalDate.now()).years < 16) return "La edad no puede ser negativa"
+        }
+
+        actualizarUsuarioDTO.sexo?.let {
+            if (it != "H" && it != "M") return "El sexo debe ser 'H' (hombre) o 'M' (mujer')"
+        }
+
+        return null
     }
 
 

@@ -29,4 +29,9 @@ class RutinaController {
     ): ResponseEntity<RutinaPaginadaResponseDto> {
         return rutinaService.obtenerRutinasBuscador(page, size, equipo)
     }
+
+    @GetMapping("/{idRutina}")
+    fun obtenerRutina(@PathVariable idRutina:String): ResponseEntity<RutinaDTO> {
+        return rutinaService.obtenerRutinaPorId(idRutina)
+    }
 }

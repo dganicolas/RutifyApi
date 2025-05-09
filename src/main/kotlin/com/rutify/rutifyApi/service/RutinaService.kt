@@ -1,10 +1,13 @@
 package com.rutify.rutifyApi.service
 
 import com.rutify.rutifyApi.domain.Rutina
+import com.rutify.rutifyApi.dto.EjercicioDTO
 import com.rutify.rutifyApi.dto.RutinaBuscadorDto
 import com.rutify.rutifyApi.dto.RutinaDTO
 import com.rutify.rutifyApi.dto.RutinaPaginadaResponseDto
+import com.rutify.rutifyApi.exception.exceptions.NotFoundException
 import com.rutify.rutifyApi.exception.exceptions.ValidationException
+import com.rutify.rutifyApi.repository.IEjercicioRepository
 import com.rutify.rutifyApi.repository.IRutinasRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Sort
@@ -21,22 +24,36 @@ class RutinaService {
     private lateinit var rutinaRepository: IRutinasRepository
 
     @Autowired
+    private lateinit var ejercicioRepository : IEjercicioRepository
+
+    @Autowired
     private lateinit var mongoTemplate: MongoTemplate
 
     fun crearRutina(dto: RutinaDTO): ResponseEntity<Rutina> {
         val error = validarRutina(dto)
         if (error != null) throw ValidationException(error)
 
+        val ejerciciosMap: Map<String, Int> = dto.ejercicios.associate { ejercicioDto ->
+            val idEjercicio = obtenerIdDeEjercicio(ejercicioDto.id)
+            idEjercicio to ejercicioDto.cantidad
+        }
+
         val rutina = Rutina(
             nombre = dto.nombre,
+            imagen = dto.imagen,
             descripcion = dto.descripcion,
             creadorId = dto.creadorId,
-            ejercicios = dto.ejercicios,
+            ejercicios = ejerciciosMap,
             esPremium = dto.esPremium
         )
 
         val guardada = rutinaRepository.save(rutina)
         return ResponseEntity.ok(guardada)
+    }
+
+    private fun obtenerIdDeEjercicio(id: String): String {
+        val ejercicio = ejercicioRepository.findById(id).orElseThrow{ throw NotFoundException("Ejercicio no encontrado")}
+        return ejercicio.id
     }
 
     private fun validarRutina(dto: RutinaDTO): String? {
@@ -57,6 +74,7 @@ class RutinaService {
             RutinaBuscadorDto(
                 id = it.id,
                 nombre = it.nombre,
+                imagen = it.imagen,
                 descripcion = it.descripcion,
                 cuantosEjercicios = it.ejercicios.size,
                 esPremium = it.esPremium,
@@ -87,5 +105,41 @@ class RutinaService {
         query.skip((page * size).toLong())
         query.limit(size)
         return query
+    }
+
+    fun obtenerRutinaPorId(idRutina: String): ResponseEntity<RutinaDTO> {
+        val rutina = rutinaRepository.findById(idRutina).orElseThrow{ NotFoundException("No se encontró la rutina con ID: $idRutina")}
+
+        val idsEjercicios = rutina.ejercicios.keys.toList()
+
+        val ejercicios = ejercicioRepository.findAllById(idsEjercicios)
+
+        val ejercicioDto: MutableList<EjercicioDTO> = mutableListOf()
+        val repeticiones = rutina.ejercicios.values.toList()
+        ejercicios.forEachIndexed {index, ejercicio ->
+            ejercicioDto.add(
+            EjercicioDTO(
+                id= idsEjercicios[index],
+                nombreEjercicio = ejercicio.nombreEjercicio,
+                descripcion = ejercicio.descripcion,
+                imagen = ejercicio.imagen,
+                equipo = ejercicio.equipo,
+                grupoMuscular = ejercicio.grupoMuscular,
+                caloriasQuemadasPorRepeticion = ejercicio.caloriasQuemadasPorRepeticion,
+                puntoGanadosPorRepeticion = ejercicio.puntoGanadosPorRepeticion,
+                cantidad = repeticiones[index]
+            ))
+        }
+        val rutinaDto = RutinaDTO(
+            nombre = rutina.nombre,
+            imagen = rutina.imagen,
+            descripcion = rutina.descripcion,
+            creadorId = rutina.creadorId,
+            ejercicios = ejercicioDto,
+            equipo = rutina.equipo,
+            esPremium = rutina.esPremium
+        )
+        return ResponseEntity.ok(rutinaDto)
+
     }
 }

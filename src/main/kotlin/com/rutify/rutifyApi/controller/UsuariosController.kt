@@ -23,33 +23,36 @@ class UsuariosController(private val db: Firestore) {
 
     @PostMapping("/acceder")
     fun loginUsuario(@RequestBody login: UsuarioCredencialesDto): ResponseEntity<UsuarioLoginDto> {
-        return usuariosService.loginUsuarios(login)
+       return usuariosService.loginUsuarios(login)
     }
 
-    @DeleteMapping("/eliminar/{correo}")
+    @DeleteMapping("/eliminar")
     fun eliminarCuenta(
-        @PathVariable correo: String,
+        @RequestBody eliminarUsuarioDTO: EliminarUsuarioDTO,
         authentication: Authentication
-    ) {
-        return usuariosService.eliminarUsuarioPorCorreo(correo, authentication)
+    ): ResponseEntity<Void> {
+        return usuariosService.eliminarUsuarioPorCorreo(eliminarUsuarioDTO.correo, authentication)
     }
 
     @GetMapping("/buscar/{nombre}")
-    fun buscarUsuariosPorNombre(@PathVariable nombre: String): ResponseEntity<List<UsuarioBusquedaDto>> {
-        return usuariosService.buscarUsuariosPorNombre(nombre)
+    fun buscarUsuariosPorNombre(
+        @RequestParam nombre: String,
+        @RequestParam pagina: Int,
+        @RequestParam tamaño: Int
+    ): ResponseEntity<BusquedaUsuariosRespuesta> {
+        return usuariosService.buscarUsuariosPorNombre(nombre, pagina, tamaño)
     }
 
     @GetMapping("/detalle/{idFirebase}")
     fun obtenerDetalleUsuario(@PathVariable idFirebase: String,authentication: Authentication ): ResponseEntity<UsuarioInformacionDto> {
-        return usuariosService.obtenerDetalleUsuario(idFirebase)
+        return usuariosService.obtenerDetalleUsuario(idFirebase,authentication)
     }
 
-    @PutMapping("/actualizar/{correo}")
+    @PutMapping("/actualizar")
     fun actualizarCorreo(
-        @PathVariable correo: String,
         authentication: Authentication,
         @RequestBody actualizarUsuarioDTO: ActualizarUsuarioDTO
     ): ResponseEntity<ActualizarUsuarioDTO> {
-        return usuariosService.actualizarCuenta(correo,authentication,actualizarUsuarioDTO)
+        return usuariosService.actualizarCuenta(authentication,actualizarUsuarioDTO)
     }
 }
