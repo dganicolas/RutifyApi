@@ -16,16 +16,16 @@ dateFormat  DD-MM-YYYY
 title       Diagrama temporal de la api   
 section Acciones
 
-    Creacion del proyecto: 1, 09-04-2024,1d
+    Creacion del proyecto: 1, 09-04-2025,1d
 
-    Creo plan de desarrollo en trello: 2, 09-04-2024,1d
+    Creo plan de desarrollo en trello: 2, 09-04-2025,1d
 
-    mejoro la interfaz en figma: 3, 09-04-2024,1d
-    Popular la base de datos : 4, 11-04-2024,1d
-    Defino las entidades: 5, 15-04-2024,1d
+    mejoro la interfaz en figma: 3, 09-04-2025,1d
+    Popular la base de datos : 4, 11-04-2025,1d
+    Defino las entidades: 5, 15-04-2025,1d
     controlador Usuarios realizados: 6, 19-04-2025, 5d
-    controlador Rutinas realizados: 7, 10-05-2024,1
-    entrega de proyecto: milestone, final, 15-06-2024,1d
+    controlador Rutinas realizados: 7, 10-05-2025,1
+    entrega de proyecto: milestone, final, 15-06-2025,1d
 section errores encontrados
 ```
 
