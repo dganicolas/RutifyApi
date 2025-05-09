@@ -24,7 +24,7 @@ section Acciones
     Popular la base de datos : 4, 11-04-2024,1d
     Defino las entidades: 5, 15-04-2024,1d
     controlador Usuarios realizados: 6, 19-04-2025, 5d
-
+    controlador Rutinas realizados: 7, 10-05-2024,1
     entrega de proyecto: milestone, final, 15-06-2024,1d
 section errores encontrados
 ```
