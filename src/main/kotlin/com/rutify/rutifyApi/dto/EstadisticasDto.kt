@@ -1,10 +1,12 @@
 package com.rutify.rutifyApi.dto
 
 data class EstadisticasDto(
-    val lvlBrazo: Float,
-    val lvlPecho: Float,
-    val lvlEspalda: Float,
-    val lvlPiernas: Float,
+    val idFirebase: String,
+    val lvlBrazo: Double,
+    val lvlAbdominal:Double,
+    val lvlPecho: Double,
+    val lvlEspalda: Double,
+    val lvlPiernas: Double,
     val ejerciciosRealizados: Int,
-    val caloriasQuemadas: Float
+    val kCaloriasQuemadas: Double
 )

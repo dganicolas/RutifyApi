@@ -22,8 +22,8 @@ class SecurityConfig{
                     .requestMatchers("/v1/usuarios/registrarse").permitAll()  // URL pública
                     .requestMatchers("/v1/usuarios/acceder").permitAll()
                     .requestMatchers("/v1/usuarios/**").authenticated()  // URLs privadas para usuarios autenticados
-                    //.anyRequest().authenticated() // Aseguramos que todas las solicitudes requieran autenticación
-                    .anyRequest().permitAll()
+                    .anyRequest().authenticated() // Aseguramos que todas las solicitudes requieran autenticación
+                    //.anyRequest().permitAll()
             }
             .oauth2ResourceServer { it.jwt { } }
             .build()

@@ -175,7 +175,7 @@ class UsuariosService {
         val usuario = usuarioRepository.findByIdFirebase(idFirebase)
             ?: throw NotFoundException("Usuario no encontrado")
         val estadisticas = estadisticasRepository.findByIdFirebase(idFirebase) ?:
-        Estadisticas(null,"",0f, 0f, 0f, 0f, 0, 0f)
+        Estadisticas(null,"",0.0, 0.0, 0.0, 0.0, 0.0, 0, 0.0)
         val totalRutinas = rutinaRepository.countByCreadorId(idFirebase)
         if (usuario.perfilPublico || usuario.idFirebase == authentication.name) {
             return ResponseEntity.ok(
@@ -263,6 +263,13 @@ class UsuariosService {
         }
 
         return null
+    }
+
+    fun EsAdmin(idFirebase: String): ResponseEntity<Boolean> {
+        val usuario = usuarioRepository.findByIdFirebase(idFirebase)
+            ?: throw NotFoundException("Usuario no encontrado")
+
+        return ResponseEntity.ok(usuario.rol == "admin")
     }
 
 

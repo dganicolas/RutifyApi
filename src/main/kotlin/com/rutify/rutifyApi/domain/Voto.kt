@@ -9,9 +9,9 @@ data class Voto(
     @Id
     val id: String? = null,
     @Field
-    val idFirebase: String,  // ID del usuario que vota
+    val idFirebase: String,
     @Field
-    val idRutina: String,    // ID de la rutina votada
+    val idRutina: String,
     @Field
-    val puntuacion: Int      // Puntuación dada por el usuario
+    var puntuacion: Float
 )

@@ -12,15 +12,17 @@ data class Estadisticas(
     @Field
     val idFirebase: String,
     @Field
-    val lvlBrazo: Float,
+    var lvlBrazo: Double,
     @Field
-    val lvlPecho: Float,
+    var lvlPecho: Double,
     @Field
-    val lvlEspalda: Float,
+    var lvlAbdominal: Double,
     @Field
-    val lvlPiernas: Float,
+    var lvlEspalda: Double,
     @Field
-    val ejerciciosRealizados: Int,
+    var lvlPiernas: Double,
     @Field
-    val caloriasQuemadas: Float
+    var ejerciciosRealizados: Int,
+    @Field
+    var kCaloriasQuemadas: Double
 )

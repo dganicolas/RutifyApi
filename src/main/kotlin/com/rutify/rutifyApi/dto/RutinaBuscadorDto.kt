@@ -6,6 +6,8 @@ data class RutinaBuscadorDto(
     val imagen:String,
     val descripcion: String,
     val cuantosEjercicios: Int,
+    val votos:Float,
+    val totalVotos: Int,
     val esPremium: Boolean,
     val equipo:String,
 )

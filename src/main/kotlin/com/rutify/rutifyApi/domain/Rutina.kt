@@ -21,6 +21,10 @@ data class Rutina(
     @Field
     val esPremium: Boolean,
     @Field
+    var votos:Float = 0.0f,
+    @Field
+    var totalVotos: Int = 0,
+    @Field
     val equipo:String = "no especificado",
     @Field
     val reportes: Int = 0,

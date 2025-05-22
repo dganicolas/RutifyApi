@@ -27,6 +27,7 @@ class EjerciciosService {
         }
 
         val ejercicio = Ejercicio(
+            id = null,
             nombreEjercicio = ejercicioDTO.nombreEjercicio,
             descripcion = ejercicioDTO.descripcion,
             imagen = ejercicioDTO.imagen,
@@ -56,7 +57,7 @@ class EjerciciosService {
             equipo: String?,
             page: Int?,
             size: Int?
-        ): List<Ejercicio> {
+        ): List<EjercicioDTO> {
             // Si no hay filtros, devolver todos los ejercicios
             val filtroGrupoMuscular = grupoMuscular?.takeIf { it.isNotBlank() }
             val filtroEquipo = equipo?.takeIf { it.isNotBlank() }
@@ -80,8 +81,22 @@ class EjerciciosService {
             size?.let {
                 query.limit(it)  // Limitar el tamaño de la página
             }
+            val ejercicios = mongoTemplate.find(query, Ejercicio::class.java)
 
             // Consultar los ejercicios con la query preparada
-            return mongoTemplate.find(query, Ejercicio::class.java)
+            return ejercicios.map { ejercicio ->
+                // Aquí conviertes de entidad `Ejercicio` a DTO si lo necesitas
+                EjercicioDTO(
+                    id = ejercicio.id!!,
+                    nombreEjercicio = ejercicio.nombreEjercicio,
+                    descripcion = ejercicio.descripcion,
+                    equipo = ejercicio.equipo,
+                    grupoMuscular = ejercicio.grupoMuscular,
+                    imagen = ejercicio.imagen,
+                    caloriasQuemadasPorRepeticion = ejercicio.caloriasQuemadasPorRepeticion,
+                    puntoGanadosPorRepeticion = ejercicio.puntoGanadosPorRepeticion,
+                    cantidad = 0
+                )
+            }
         }
 }

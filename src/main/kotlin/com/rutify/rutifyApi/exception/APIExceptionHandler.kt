@@ -1,10 +1,7 @@
 package com.rutify.rutifyApi.exception
 
 import com.rutify.rutifyApi.domain.Log
-import com.rutify.rutifyApi.exception.exceptions.InternalServerErrorException
-import com.rutify.rutifyApi.exception.exceptions.NotFoundException
-import com.rutify.rutifyApi.exception.exceptions.UnauthorizedException
-import com.rutify.rutifyApi.exception.exceptions.ValidationException
+import com.rutify.rutifyApi.exception.exceptions.*
 import com.rutify.rutifyApi.utils.LogUtils
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.http.HttpStatus
@@ -34,6 +31,14 @@ class APIExceptionHandler {
     fun handleUnauthorized(request: HttpServletRequest, e: UnauthorizedException): ErrorRespuesta {
         LogUtils.writeLog(Log(request.method, request.requestURI, false, HttpStatus.UNAUTHORIZED))
         return ErrorRespuesta(e.message ?: "Unauthorized", request.requestURI)
+    }
+
+    @ExceptionHandler(ConflictException::class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ResponseBody
+    fun handleConflict(request: HttpServletRequest, e: Exception): ErrorRespuesta {
+        LogUtils.writeLog(Log(request.method, request.requestURI, false, HttpStatus.CONFLICT))
+        return ErrorRespuesta(e.message ?: "Conflicto detectado.", request.requestURI)
     }
 
 

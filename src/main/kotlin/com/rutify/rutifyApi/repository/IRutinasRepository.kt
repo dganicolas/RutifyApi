@@ -5,6 +5,6 @@ import org.springframework.data.mongodb.repository.MongoRepository
 import java.util.*
 
 interface IRutinasRepository : MongoRepository<Rutina, String>{
-    override fun findById(idRutina: String): Optional<Rutina>
+    override fun findById(id: String): Optional<Rutina>
     fun countByCreadorId(idFirebase: String): Long
 }

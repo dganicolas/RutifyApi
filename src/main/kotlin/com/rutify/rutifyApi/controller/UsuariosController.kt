@@ -55,4 +55,9 @@ class UsuariosController(private val db: Firestore) {
     ): ResponseEntity<ActualizarUsuarioDTO> {
         return usuariosService.actualizarCuenta(authentication,actualizarUsuarioDTO)
     }
+
+    @GetMapping("/esAdmin/{idFirebase}")
+    fun EsAdmin(@PathVariable idFirebase: String): ResponseEntity<Boolean> {
+        return usuariosService.EsAdmin(idFirebase)
+    }
 }

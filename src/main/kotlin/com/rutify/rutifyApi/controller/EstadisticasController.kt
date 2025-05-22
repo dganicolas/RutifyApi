@@ -1,6 +1,8 @@
 package com.rutify.rutifyApi.controller
 
 import com.rutify.rutifyApi.domain.Estadisticas
+import com.rutify.rutifyApi.dto.EstadisticasDto
+import com.rutify.rutifyApi.dto.EstadisticasPatchDto
 import com.rutify.rutifyApi.service.EstadisticasService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
@@ -17,21 +19,21 @@ class EstadisticasController {
     fun crearEstadisticas(
         @RequestBody estadisticas: Estadisticas,
         authentication: Authentication,
-    ): ResponseEntity<Estadisticas> {
+    ): ResponseEntity<EstadisticasDto> {
         return estadisticasService.crearEstadisticas(estadisticas, authentication)
     }
 
     @GetMapping("/{usuarioId}")
-    fun obtenerEstadisticas(@PathVariable usuarioId: String): ResponseEntity<Estadisticas> {
+    fun obtenerEstadisticas(@PathVariable usuarioId: String): ResponseEntity<EstadisticasDto> {
         return estadisticasService.obtenerEstadisticasPorUsuarioId(usuarioId)
     }
 
-    @PutMapping("/{usuarioId}")
+    @PatchMapping("/{usuarioId}")
     fun actualizarEstadisticas(
         @PathVariable usuarioId: String,
-        @RequestBody estadisticasActualizadas: Estadisticas,
+        @RequestBody estadisticasActualizadas: EstadisticasPatchDto,
         authentication: Authentication,
-    ): ResponseEntity<Estadisticas> {
+    ): ResponseEntity<EstadisticasDto> {
         return estadisticasService.actualizarEstadisticas(usuarioId, estadisticasActualizadas, authentication)
     }
 
@@ -39,7 +41,7 @@ class EstadisticasController {
     fun reiniciarEstadisticas(
         @PathVariable usuarioId: String,
         authentication: Authentication,
-    ): ResponseEntity<Estadisticas> {
+    ): ResponseEntity<EstadisticasDto> {
         return estadisticasService.reiniciarEstadisticas(usuarioId, authentication)
     }
 
@@ -47,7 +49,7 @@ class EstadisticasController {
     fun eliminarEstadisticas(
         @PathVariable usuarioId: String,
         authentication: Authentication,
-    ): ResponseEntity<Void> {
+    ): ResponseEntity<EstadisticasDto> {
         return estadisticasService.eliminarEstadisticasPorUsuarioId(usuarioId, authentication)
     }
 

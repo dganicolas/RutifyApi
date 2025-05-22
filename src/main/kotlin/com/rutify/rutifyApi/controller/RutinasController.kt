@@ -1,12 +1,11 @@
 package com.rutify.rutifyApi.controller
 
-import com.rutify.rutifyApi.domain.Rutina
 import com.rutify.rutifyApi.dto.RutinaBuscadorDto
 import com.rutify.rutifyApi.dto.RutinaDTO
-import com.rutify.rutifyApi.dto.RutinaPaginadaResponseDto
 import com.rutify.rutifyApi.service.RutinaService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
+import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -17,21 +16,26 @@ class RutinaController {
     private lateinit var rutinaService: RutinaService
 
     @PostMapping("/crear")
-    fun crearRutina(@RequestBody rutinaDTO: RutinaDTO): ResponseEntity<Rutina> {
+    fun crearRutina(@RequestBody rutinaDTO: RutinaDTO): ResponseEntity<RutinaDTO> {
         return rutinaService.crearRutina(rutinaDTO)
     }
 
-    @GetMapping
+    @GetMapping("/verRutinas")
     fun verRutinas(
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "10") size: Int,
         @RequestParam(required = false) equipo: String?
-    ): ResponseEntity<RutinaPaginadaResponseDto> {
+    ): ResponseEntity<List<RutinaBuscadorDto>> {
         return rutinaService.obtenerRutinasBuscador(page, size, equipo)
     }
 
     @GetMapping("/{idRutina}")
     fun obtenerRutina(@PathVariable idRutina:String): ResponseEntity<RutinaDTO> {
         return rutinaService.obtenerRutinaPorId(idRutina)
+    }
+
+    @DeleteMapping("/eliminar/{idRutina}")
+    fun eliminarRutina(@PathVariable idRutina: String,authentication: Authentication): ResponseEntity<Void> {
+        return rutinaService.eliminarRutina(idRutina,authentication)
     }
 }

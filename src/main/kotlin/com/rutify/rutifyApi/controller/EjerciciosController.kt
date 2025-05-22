@@ -19,13 +19,14 @@ class EjerciciosController {
         return ejerciciosService.crearEjercicio(ejercicioDTO)
     }
 
-    @GetMapping
+    @GetMapping("/obteneEjercicios")
     fun obtenerEjercicios(
         @RequestParam(required = false) grupoMuscular: String?,
         @RequestParam(required = false) equipo: String?,
         @RequestParam(required = false) page: Int?,
         @RequestParam(required = false) size: Int?
-    ): ResponseEntity<List<Ejercicio>> {
+    ): ResponseEntity<List<EjercicioDTO>> {
+        println("llego")
         val ejercicios = ejerciciosService.obtenerEjercicios(grupoMuscular, equipo, page, size)
         return ResponseEntity.ok(ejercicios)
     }

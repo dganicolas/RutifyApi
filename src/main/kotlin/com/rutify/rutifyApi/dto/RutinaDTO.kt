@@ -1,7 +1,5 @@
 package com.rutify.rutifyApi.dto
 
-import com.rutify.rutifyApi.domain.Ejercicio
-
 data class RutinaDTO(
     val id: String? = null,
     val nombre: String,
@@ -10,5 +8,7 @@ data class RutinaDTO(
     val creadorId: String,
     val ejercicios: List<EjercicioDTO>,
     val equipo:String = "no especificado",
+    val votos:Float = 0.0f,
+    val totalVotos: Int = 0,
     val esPremium: Boolean
 )
