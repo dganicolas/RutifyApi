@@ -4,6 +4,7 @@ import com.rutify.rutifyApi.domain.Ejercicio
 import com.rutify.rutifyApi.dto.EjercicioDTO
 import com.rutify.rutifyApi.exception.exceptions.ValidationException
 import com.rutify.rutifyApi.repository.IEjercicioRepository
+import com.rutify.rutifyApi.utils.DTOMapper.ejercicioDtoToEjercicio
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.query.Criteria
@@ -22,19 +23,7 @@ class EjerciciosService {
 
     fun crearEjercicio(ejercicioDTO: EjercicioDTO): ResponseEntity<Ejercicio> {
         validarEjercicio(ejercicioDTO)
-
-        val ejercicio = Ejercicio(
-            id = null,
-            nombreEjercicio = ejercicioDTO.nombreEjercicio,
-            descripcion = ejercicioDTO.descripcion,
-            imagen = ejercicioDTO.imagen,
-            equipo = ejercicioDTO.equipo,
-            grupoMuscular = ejercicioDTO.grupoMuscular,
-            caloriasQuemadasPorRepeticion = ejercicioDTO.caloriasQuemadasPorRepeticion,
-            puntoGanadosPorRepeticion = ejercicioDTO.puntoGanadosPorRepeticion
-        )
-
-        val ejercicioGuardado = ejerciciosRepository.save(ejercicio)
+        val ejercicioGuardado = ejerciciosRepository.save(ejercicioDtoToEjercicio(ejercicioDTO))
         return ResponseEntity.ok(ejercicioGuardado)
     }
 

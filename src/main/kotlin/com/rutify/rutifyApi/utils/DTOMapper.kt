@@ -85,6 +85,18 @@ object DTOMapper {
         )
     }
 
+    fun ejercicioDtoToEjercicio(ejercicioDTO: EjercicioDTO): Ejercicio {
+        return Ejercicio(
+            id = null,
+            nombreEjercicio = ejercicioDTO.nombreEjercicio,
+            descripcion = ejercicioDTO.descripcion,
+            imagen = ejercicioDTO.imagen,
+            equipo = ejercicioDTO.equipo,
+            grupoMuscular = ejercicioDTO.grupoMuscular,
+            caloriasQuemadasPorRepeticion = ejercicioDTO.caloriasQuemadasPorRepeticion,
+            puntoGanadosPorRepeticion = ejercicioDTO.puntoGanadosPorRepeticion
+        )
+    }
     fun votoTovotosDto(voto:Voto): VotodDto {
         return VotodDto(
             id = voto.id,
