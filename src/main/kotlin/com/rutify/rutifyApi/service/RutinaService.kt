@@ -37,7 +37,12 @@ class RutinaService {
     private lateinit var usuariosRepository: IUsuarioRepository
 
     @Autowired
+    lateinit var emailService: EmailService
+
+    @Autowired
     private lateinit var mongoTemplate: MongoTemplate
+
+
 
     fun crearRutina(dto: RutinaDTO): ResponseEntity<RutinaDTO> {
         validarRutina(dto)
@@ -103,6 +108,7 @@ class RutinaService {
         val rutina = rutinaRepository.findById(idRutina).orElseThrow { NotFoundException("No se encontró la rutina con ID: $idRutina") }!!
 
         if (rutina.creadorId != authentication.name && usuario.rol != "admin") throw UnauthorizedException("No tienes permiso para crear este voto a otro usuario")
+        if( usuario.rol == "admin")emailService.enviarCorreoNotificacion(usuario.correo,"rutina eliminada", "Hemos eliminado tu rutina ${rutina.nombre} por incumplimiento de la comunidad")
 
         rutinaRepository.delete(rutina)
         return ResponseEntity.noContent().build()

@@ -45,6 +45,8 @@ class UsuariosController(private val db: Firestore) {
 
     @GetMapping("/detalle/{idFirebase}")
     fun obtenerDetalleUsuario(@PathVariable idFirebase: String,authentication: Authentication ): ResponseEntity<UsuarioInformacionDto> {
+        println(idFirebase)
+        println(authentication.name)
         return usuariosService.obtenerDetalleUsuario(idFirebase,authentication)
     }
 

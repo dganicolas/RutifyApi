@@ -4,27 +4,20 @@ import org.bson.types.ObjectId
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.Field
+import java.time.LocalDate
 
-@Document(collection = "Estadisticas")
-data class Estadisticas(
+@Document(collection = "EstadisticasDiarias")
+data class EstadisticasDiarias(
     @Id
     val _id: String? = null,
     @Field
     val idFirebase: String,
     @Field
-    var lvlBrazo: Double,
-    @Field
-    var lvlPecho: Double,
-    @Field
-    var lvlAbdominal: Double,
-    @Field
-    var pesoCorporal: Double,
-    @Field
-    var lvlEspalda: Double,
-    @Field
-    var lvlPiernas: Double,
+    val fecha: LocalDate,
     @Field
     val minActivo: Double,
+    @Field
+    val PesoCorporal: Double,
     @Field
     var ejerciciosRealizados: Int,
     @Field

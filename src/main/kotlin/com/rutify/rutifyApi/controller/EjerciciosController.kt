@@ -26,7 +26,6 @@ class EjerciciosController {
         @RequestParam(required = false) page: Int?,
         @RequestParam(required = false) size: Int?
     ): ResponseEntity<List<EjercicioDTO>> {
-        println("llego")
         val ejercicios = ejerciciosService.obtenerEjercicios(grupoMuscular, equipo, page, size)
         return ResponseEntity.ok(ejercicios)
     }

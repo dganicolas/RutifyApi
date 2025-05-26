@@ -105,4 +105,20 @@ object DTOMapper {
             puntuacion = voto.puntuacion
         )
     }
+
+    fun estadisticasDiariasToDto(estadisticas: EstadisticasDiarias): EstadisticasDiariasDto {
+        return EstadisticasDiariasDto(
+            _id = estadisticas._id,
+            idFirebase = estadisticas.idFirebase,
+            fecha = estadisticas.fecha,
+            minActivo = estadisticas.minActivo,
+            PesoCorporal = estadisticas.PesoCorporal,
+            ejerciciosRealizados = estadisticas.ejerciciosRealizados,
+            kCaloriasQuemadas = estadisticas.kCaloriasQuemadas
+        )
+    }
+
+    fun listaEstadisticasDiariasToDto(lista: List<EstadisticasDiarias>): List<EstadisticasDiariasDto> {
+        return lista.map { estadisticasDiariasToDto(it) }
+    }
 }

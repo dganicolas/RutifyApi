@@ -49,7 +49,7 @@ dependencies {
 
 	implementation("org.mongodb:mongodb-driver-kotlin-sync:5.3.0")
 	implementation("org.springframework.boot:spring-boot-starter-webflux")
-
+	implementation("org.springframework.boot:spring-boot-starter-mail")
 	implementation("com.google.protobuf:protobuf-java:4.28.2")
 	implementation("io.grpc:grpc-netty-shaded:1.63.0")
 	implementation("io.grpc:grpc-protobuf:1.63.0")

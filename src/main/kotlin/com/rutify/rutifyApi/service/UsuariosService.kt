@@ -43,7 +43,7 @@ class UsuariosService {
     lateinit var estadisticasRepository: IEstadisticasRepository
 
     @Autowired
-    lateinit var db: Firestore
+    lateinit var emailService: EmailService
 
     @Autowired
     lateinit var rutinaRepository: IRutinasRepository
@@ -102,7 +102,7 @@ class UsuariosService {
         }
 
         if (usuario.sexo != "H" && usuario.sexo != "M") {
-            return "El sexo debe ser 'H' (hombre) o 'M' (mujer')"
+            return "El sexo debe ser 'H' (hombre), 'M' (mujer) O 'O' (otro sexo)"
         }
 
         if (usuarioRepository.findByCorreo(usuario.correo) != null) {
@@ -153,6 +153,7 @@ class UsuariosService {
 
         eliminarDeFirestore(usuario.idFirebase)
         eliminarDeMongoDb(correo)
+        emailService.enviarCorreoNotificacion(usuario.correo,"Cuenta eliminada de rutify","su cuenta a sido eliminada el dia ${LocalDate.now()}, lamentamos que te hayas despedido de nosotro")
         return ResponseEntity.noContent().build()
     }
 
@@ -175,7 +176,7 @@ class UsuariosService {
         val usuario = usuarioRepository.findByIdFirebase(idFirebase)
             ?: throw NotFoundException("Usuario no encontrado")
         val estadisticas = estadisticasRepository.findByIdFirebase(idFirebase) ?:
-        Estadisticas(null,"",0.0, 0.0, 0.0, 0.0, 0.0, 0, 0.0)
+        Estadisticas(null,"",0.0, 0.0,0.0 , 0.0, 0.0, 0.0,0.0, 0, 0.0)
         val totalRutinas = rutinaRepository.countByCreadorId(idFirebase)
         if (usuario.perfilPublico || usuario.idFirebase == authentication.name) {
             return ResponseEntity.ok(
