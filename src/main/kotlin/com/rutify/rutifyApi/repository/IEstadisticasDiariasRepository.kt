@@ -13,4 +13,6 @@ interface IEstadisticasDiariasRepository : MongoRepository<EstadisticasDiarias, 
         fechaInicio: LocalDate,
         fechaFin: LocalDate
     ): List<EstadisticasDiarias>
+
+    fun findTop5ByIdFirebaseOrderByFechaDesc(idFirebase: String): List<EstadisticasDiarias>
 }

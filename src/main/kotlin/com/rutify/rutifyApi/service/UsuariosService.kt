@@ -70,7 +70,8 @@ class UsuariosService {
                 correo = usuario.correo,
                 gimnasioId = null,
                 esPremium = false,
-                rol = "user"
+                rol = "user",
+                fechaUltimoReto = LocalDate.now().minusDays(-1)
             )
 
             usuarioRepository.save(nuevoUsuario)
@@ -273,5 +274,20 @@ class UsuariosService {
         return ResponseEntity.ok(usuario.rol == "admin")
     }
 
+    fun marcarRetoDiario(authentication: Authentication): ResponseEntity<Boolean> {
+        val idFirebase = authentication.name
+        val usuario = usuarioRepository.findByIdFirebase(idFirebase)?: throw NotFoundException("Usuario no encontrado")
+
+        val hoy = LocalDate.now()
+        val fechaUltimoReto = usuario.fechaUltimoReto
+
+        return if (fechaUltimoReto == hoy) {
+            ResponseEntity.ok(true)
+        } else {
+            usuario.fechaUltimoReto = hoy
+            usuarioRepository.save(usuario)
+            ResponseEntity.ok(false)
+        }
+    }
 
 }

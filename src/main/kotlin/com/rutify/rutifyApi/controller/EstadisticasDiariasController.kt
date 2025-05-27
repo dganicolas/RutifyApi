@@ -1,15 +1,11 @@
 package com.rutify.rutifyApi.controller
 
-import com.rutify.rutifyApi.domain.EstadisticasDiarias
 import com.rutify.rutifyApi.dto.EstadisticasDiariasDto
+import com.rutify.rutifyApi.dto.EstadisticasDiariasPatchDto
 import com.rutify.rutifyApi.service.EstadisticasDiariasService
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import java.time.LocalDate
 
 
@@ -25,10 +21,24 @@ class EstadisticasDiariasController {
         @RequestParam fecha: LocalDate
     ): ResponseEntity<List<EstadisticasDiariasDto>> {
         return estadisticasDiariasService.obtenerEstadisticasDiariasDeUnMes(idFirebase,fecha)
-
     }
 
-    // 1. Obtener estadísticas de un día concreto
+    @GetMapping("/ultimosPesos")
+    fun obtenerUltimos5Pesos(
+        @RequestParam idFirebase: String
+    ): ResponseEntity<List<Double>> {
+        return estadisticasDiariasService.obtenerUltimos5Pesos(idFirebase)
+    }
+
+    @PatchMapping
+    fun actualizarEstadisticasDiarias(
+        @RequestParam idFirebase: String,
+        @RequestParam fecha: LocalDate,
+        @RequestBody patch: EstadisticasDiariasPatchDto
+    ): ResponseEntity<EstadisticasDiariasDto> {
+        return estadisticasDiariasService.findByIdFirebaseAndFecha(idFirebase, fecha, patch)
+    }
+
     @GetMapping("/dia")
     fun obtenerEstadisticasDiariasDia(
         @RequestParam idFirebase: String,

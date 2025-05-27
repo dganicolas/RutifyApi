@@ -6,6 +6,7 @@ data class EstadisticasPatchDto(
     val lvlEspalda: Double? = null,
     val lvlPiernas: Double? = null,
     val ejerciciosRealizados: Int? = null,
+    val horasActivo: Double? = null,
     val kCaloriasQuemadas: Double? = null,
     val lvlAbdominal: Double? = null
 )

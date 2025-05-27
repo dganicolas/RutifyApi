@@ -19,6 +19,8 @@ data class Usuario(
     @Field
     var correo: String,
     @Field
+    var fechaUltimoReto: LocalDate,
+    @Field
     var gimnasioId: ObjectId? = null,
     @Field
     var avatar: String = "",

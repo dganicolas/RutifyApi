@@ -34,8 +34,6 @@ object DTOMapper {
         )
     }
 
-
-
     fun ejercicioToEjercicioDto(ejercicio: Ejercicio,cantidad:Int):EjercicioDTO{
         return  EjercicioDTO(
             id = ejercicio.id!!,
@@ -111,8 +109,8 @@ object DTOMapper {
             _id = estadisticas._id,
             idFirebase = estadisticas.idFirebase,
             fecha = estadisticas.fecha,
-            minActivo = estadisticas.minActivo,
-            PesoCorporal = estadisticas.PesoCorporal,
+            horasActivos = estadisticas.horasActivo,
+            pesoCorporal = estadisticas.pesoCorporal,
             ejerciciosRealizados = estadisticas.ejerciciosRealizados,
             kCaloriasQuemadas = estadisticas.kCaloriasQuemadas
         )

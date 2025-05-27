@@ -34,13 +34,13 @@ class UsuariosController(private val db: Firestore) {
         return usuariosService.eliminarUsuarioPorCorreo(eliminarUsuarioDTO.correo, authentication)
     }
 
-    @GetMapping("/buscar/{nombre}")
+    @GetMapping("/buscar/{nombre}/{pagina}/{tamano}")
     fun buscarUsuariosPorNombre(
-        @RequestParam nombre: String,
-        @RequestParam pagina: Int,
-        @RequestParam tamaño: Int
+        @PathVariable nombre: String,
+        @PathVariable pagina: Int,
+        @PathVariable tamano: Int
     ): ResponseEntity<BusquedaUsuariosRespuesta> {
-        return usuariosService.buscarUsuariosPorNombre(nombre, pagina, tamaño)
+        return usuariosService.buscarUsuariosPorNombre(nombre, pagina, tamano)
     }
 
     @GetMapping("/detalle/{idFirebase}")
@@ -61,5 +61,10 @@ class UsuariosController(private val db: Firestore) {
     @GetMapping("/esAdmin/{idFirebase}")
     fun EsAdmin(@PathVariable idFirebase: String): ResponseEntity<Boolean> {
         return usuariosService.EsAdmin(idFirebase)
+    }
+
+    @PostMapping("/reto-diario")
+    fun retoDiario(authentication: Authentication): ResponseEntity<Boolean> {
+        return usuariosService.marcarRetoDiario(authentication)
     }
 }

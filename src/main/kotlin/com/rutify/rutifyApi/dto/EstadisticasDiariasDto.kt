@@ -6,8 +6,8 @@ data class EstadisticasDiariasDto(
     val _id: String? = null,
     val idFirebase: String,
     val fecha: LocalDate,
-    val minActivo: Double,
-    val PesoCorporal: Double,
+    val horasActivos: Double,
+    val pesoCorporal: Double,
     var ejerciciosRealizados: Int,
     var kCaloriasQuemadas: Double
 )

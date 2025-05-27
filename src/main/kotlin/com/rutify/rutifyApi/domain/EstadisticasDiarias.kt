@@ -1,6 +1,5 @@
 package com.rutify.rutifyApi.domain
 
-import org.bson.types.ObjectId
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.Field
@@ -15,9 +14,9 @@ data class EstadisticasDiarias(
     @Field
     val fecha: LocalDate,
     @Field
-    val minActivo: Double,
+    val horasActivo: Double,
     @Field
-    val PesoCorporal: Double,
+    val pesoCorporal: Double,
     @Field
     var ejerciciosRealizados: Int,
     @Field

@@ -32,36 +32,8 @@ class EstadisticasService {
         if (existente != null) {
             throw ConflictException("ya existe una estadisticas con el mismo id")
         }
-        apuntarEstadisticasDiarias(estadisticas)
         val guardada = estadisticasRepository.save(estadisticas)
         return ResponseEntity.status(HttpStatus.CREATED).body(DTOMapper.estadisticasToEstadisticasDto(guardada))
-    }
-
-    private fun apuntarEstadisticasDiarias(estadisticas: Estadisticas) {
-        val fechaHoy = LocalDate.now()
-
-        val estadisticaExistente = estadisticasDiariasRepository
-            .findByIdFirebaseAndFecha(estadisticas.idFirebase, fechaHoy)
-
-        if (estadisticaExistente != null) {
-            val actualizada = estadisticaExistente.copy(
-                minActivo = estadisticaExistente.minActivo + estadisticas.minActivo,
-                ejerciciosRealizados = estadisticaExistente.ejerciciosRealizados + estadisticas.ejerciciosRealizados,
-                kCaloriasQuemadas = estadisticaExistente.kCaloriasQuemadas + estadisticas.kCaloriasQuemadas,
-                PesoCorporal = estadisticas.pesoCorporal
-            )
-            estadisticasDiariasRepository.save(actualizada)
-        } else {
-            val nuevaEstadistica = EstadisticasDiarias(
-                idFirebase = estadisticas.idFirebase,
-                fecha = fechaHoy,
-                minActivo = estadisticas.minActivo,
-                PesoCorporal = estadisticas.pesoCorporal,
-                ejerciciosRealizados = estadisticas.ejerciciosRealizados,
-                kCaloriasQuemadas = estadisticas.kCaloriasQuemadas
-            )
-            estadisticasDiariasRepository.save(nuevaEstadistica)
-        }
     }
 
     fun obtenerEstadisticasPorUsuarioId(usuarioId: String): ResponseEntity<EstadisticasDto> {
@@ -84,9 +56,9 @@ class EstadisticasService {
         estadisticasParciales.lvlPecho?.let { existente.lvlPecho = it }
         estadisticasParciales.lvlEspalda?.let { existente.lvlEspalda = it }
         estadisticasParciales.lvlPiernas?.let { existente.lvlPiernas = it }
+        estadisticasParciales.horasActivo?.let { existente.horasActivo   = it }
         estadisticasParciales.ejerciciosRealizados?.let { existente.ejerciciosRealizados = it }
         estadisticasParciales.kCaloriasQuemadas?.let { existente.kCaloriasQuemadas = it }
-        apuntarEstadisticasDiarias(existente)
         val guardado = estadisticasRepository.save(existente)
 
         return ResponseEntity.ok(DTOMapper.estadisticasToEstadisticasDto(guardado))
