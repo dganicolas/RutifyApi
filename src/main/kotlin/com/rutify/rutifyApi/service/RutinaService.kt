@@ -86,6 +86,18 @@ class RutinaService {
         return query
     }
 
+
+    fun obtenerRutinasPorAutor(creadorId: String): ResponseEntity<List<RutinaBuscadorDto>> {
+        if (creadorId.isBlank()) {
+            throw ValidationException("El ID del creador no puede estar vacío")
+        }
+
+        val rutinas = rutinaRepository.findAllByCreadorId(creadorId)
+        val resultado = rutinas.map { rutinaToRutinaBuscadorDto(it) }
+
+        return ResponseEntity.ok(resultado)
+    }
+
     fun obtenerRutinaPorId(idRutina: String): ResponseEntity<RutinaDTO> {
         val rutina = rutinaRepository.findById(idRutina)
             .orElseThrow { NotFoundException("No se encontró la rutina con ID: $idRutina") }
@@ -112,5 +124,23 @@ class RutinaService {
 
         rutinaRepository.delete(rutina)
         return ResponseEntity.noContent().build()
+    }
+
+    fun buscarRutinas(nombre: String?): ResponseEntity<List<RutinaBuscadorDto>> {
+        val criteriaList = mutableListOf<Criteria>()
+
+        nombre?.takeIf { it.isNotBlank() }?.let {
+            // "^" indica que debe comenzar con ese texto
+            criteriaList.add(Criteria.where("nombre").regex("^$it", "i"))
+        }
+        val query = Query()
+        if (criteriaList.isNotEmpty()) {
+            query.addCriteria(Criteria().andOperator(*criteriaList.toTypedArray()))
+        }
+
+        val rutinas = mongoTemplate.find(query, Rutina::class.java)
+        val resultado = rutinas.map { rutinaToRutinaBuscadorDto(it) }
+
+        return ResponseEntity.ok(resultado)
     }
 }

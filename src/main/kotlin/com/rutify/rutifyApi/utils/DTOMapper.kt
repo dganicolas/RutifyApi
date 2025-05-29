@@ -119,4 +119,18 @@ object DTOMapper {
     fun listaEstadisticasDiariasToDto(lista: List<EstadisticasDiarias>): List<EstadisticasDiariasDto> {
         return lista.map { estadisticasDiariasToDto(it) }
     }
+
+    fun ComentarioToComentarioDto(comentario: Comentario): ComentarioDto{
+        return ComentarioDto(
+            _id = comentario._id,
+            idFirebase = comentario.idFirebase,
+            nombreUsuario = comentario.nombreUsuario,
+            imagenUrl = comentario.imagenUrl,
+            avatarUrl = comentario.avatarUrl,
+            fechaPublicacion = comentario.fechaPublicacion,
+            estadoAnimo = comentario.estadoAnimo,
+            texto = comentario.texto,
+            idComentarioPadre = comentario.idComentarioPadre
+        )
+    }
 }

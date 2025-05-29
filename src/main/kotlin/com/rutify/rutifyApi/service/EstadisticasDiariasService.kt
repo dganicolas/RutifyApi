@@ -49,16 +49,16 @@ class EstadisticasDiariasService {
     }
 
     fun obtenerUltimos5Pesos(idFirebase: String): ResponseEntity<List<Double>> {
-            val todas = estadisticasDiariasRepository.findTop5ByIdFirebaseOrderByFechaDesc(idFirebase)
+            val todas = estadisticasDiariasRepository.findTop5ByIdFirebase(idFirebase)
 
         val pesos = todas
             .map { it.pesoCorporal }
             .take(5) // Más recientes primero
 
         // Rellenar con ceros al principio si hay menos de 5
-        val resultado = List(5 - pesos.size) { 0.0 } + pesos
+        val resultado = List(5 - todas.size) { 0.0 } + pesos
 
-        return ResponseEntity.ok(resultado)
+        return ResponseEntity.ok(resultado.asReversed())
     }
 
 }

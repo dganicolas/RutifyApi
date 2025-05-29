@@ -189,7 +189,8 @@ class UsuariosService {
                     esPremium = usuario.esPremium,
                     avatarUrl = usuario.avatar,
                     estadisticas = DTOMapper.estadisticasToEstadisticasDto(estadisticas),
-                    countRutinas = totalRutinas
+                    countRutinas = totalRutinas,
+                    fechaUltimoReto = usuario.fechaUltimoReto
                 )
             )
         }else{

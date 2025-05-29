@@ -19,6 +19,12 @@ class EjerciciosController {
         return ejerciciosService.crearEjercicio(ejercicioDTO)
     }
 
+    @GetMapping("/retodiario")
+    fun obtenerRetoDiario(): ResponseEntity<EjercicioDTO> {
+        val ejercicios = ejerciciosService.obtenerRetoDiario()
+        return ResponseEntity.ok(ejercicios)
+    }
+
     @GetMapping("/obteneEjercicios")
     fun obtenerEjercicios(
         @RequestParam(required = false) grupoMuscular: String?,

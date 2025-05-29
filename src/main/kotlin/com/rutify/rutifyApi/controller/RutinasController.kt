@@ -29,9 +29,20 @@ class RutinaController {
         return rutinaService.obtenerRutinasBuscador(page, size, equipo)
     }
 
+    @GetMapping("/buscarRutinas")
+    fun buscarRutinas(
+        @RequestParam(required = false) nombre: String?
+    ): ResponseEntity<List<RutinaBuscadorDto>> {
+        return rutinaService.buscarRutinas(nombre)
+    }
     @GetMapping("/{idRutina}")
     fun obtenerRutina(@PathVariable idRutina:String): ResponseEntity<RutinaDTO> {
         return rutinaService.obtenerRutinaPorId(idRutina)
+    }
+
+    @GetMapping("/autor/{creadorId}")
+    fun obtenerRutinasPorAutor(@PathVariable creadorId: String): ResponseEntity<List<RutinaBuscadorDto>> {
+        return rutinaService.obtenerRutinasPorAutor(creadorId)
     }
 
     @DeleteMapping("/eliminar/{idRutina}")

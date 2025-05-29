@@ -2,6 +2,7 @@ package com.rutify.rutifyApi.service
 
 import com.rutify.rutifyApi.domain.Ejercicio
 import com.rutify.rutifyApi.dto.EjercicioDTO
+import com.rutify.rutifyApi.exception.exceptions.NotFoundException
 import com.rutify.rutifyApi.exception.exceptions.ValidationException
 import com.rutify.rutifyApi.repository.IEjercicioRepository
 import com.rutify.rutifyApi.utils.DTOMapper.ejercicioDtoToEjercicio
@@ -11,6 +12,9 @@ import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
+import java.time.LocalDate
+import java.time.temporal.ChronoUnit
+import kotlin.random.Random
 
 @Service
 class EjerciciosService {
@@ -35,6 +39,37 @@ class EjerciciosService {
         if (ejercicio.grupoMuscular.isBlank()) throw ValidationException("El grupo muscular no puede estar vacío")
         if (ejercicio.caloriasQuemadasPorRepeticion <= 0) throw ValidationException("Las calorías por repetición deben ser mayores que 0")
         if (ejercicio.puntoGanadosPorRepeticion <= 0) throw ValidationException("Los puntos por repetición deben ser mayores que 0")
+    }
+
+    fun obtenerRetoDiario(): EjercicioDTO {
+        val ejercicios = ejerciciosRepository.findAll()
+        if (ejercicios.isEmpty()) throw NotFoundException("no existen ejercicios")
+
+        val today = LocalDate.now()
+        val seed = today.toString().hashCode()
+        val rng = Random(seed)
+
+        // Mezclar y elegir 1 ejercicio de forma determinista
+        val ejerciciosMezclados = ejercicios.toMutableList()
+        for (i in ejerciciosMezclados.size - 1 downTo 1) {
+            val j = rng.nextInt(i + 1)
+            ejerciciosMezclados[i] = ejerciciosMezclados[j].also { ejerciciosMezclados[j] = ejerciciosMezclados[i] }
+        }
+
+        val ejercicio = ejerciciosMezclados.first()
+        val cantidad = rng.nextInt(20, 51) // entre 20 y 50 (inclusive)
+
+        return EjercicioDTO(
+            id = ejercicio.id!!,
+            nombreEjercicio = ejercicio.nombreEjercicio,
+            descripcion = ejercicio.descripcion,
+            equipo = ejercicio.equipo,
+            grupoMuscular = ejercicio.grupoMuscular,
+            imagen = ejercicio.imagen,
+            caloriasQuemadasPorRepeticion = ejercicio.caloriasQuemadasPorRepeticion,
+            puntoGanadosPorRepeticion = ejercicio.puntoGanadosPorRepeticion,
+            cantidad = cantidad
+        )
     }
 
     fun obtenerEjercicios(
