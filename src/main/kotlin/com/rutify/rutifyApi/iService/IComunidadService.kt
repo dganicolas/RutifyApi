@@ -1,6 +1,7 @@
 package com.rutify.rutifyApi.iService
 
 import com.rutify.rutifyApi.dto.ComentarioDto
+import org.springframework.security.core.Authentication
 import org.springframework.web.multipart.MultipartFile
 
 interface IComunidadService {
@@ -8,4 +9,5 @@ interface IComunidadService {
     fun obtenerComentarios(): List<ComentarioDto>
     fun obtenerRespuestas(idComentarioPadre: String): List<ComentarioDto>
     fun responderComentario(respuestaDto: ComentarioDto): ComentarioDto
+    fun eliminarComentario(id: String, authentication: Authentication)
 }

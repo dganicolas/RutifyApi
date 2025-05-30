@@ -42,4 +42,13 @@ class ComunidadController {
         val nuevaRespuesta = comunidadService.responderComentario(respuesta)
         return ResponseEntity.ok(nuevaRespuesta)
     }
+
+    @DeleteMapping("/comentarios/{id}")
+    fun eliminarComentario(
+        @PathVariable id: String,
+        authentication: org.springframework.security.core.Authentication
+    ): ResponseEntity<Void> {
+        comunidadService.eliminarComentario(id, authentication)
+        return ResponseEntity.noContent().build()
+    }
 }

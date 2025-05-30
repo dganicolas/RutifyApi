@@ -37,7 +37,10 @@ dependencies {
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	runtimeOnly("com.mysql:mysql-connector-j")
 	providedRuntime("org.springframework.boot:spring-boot-starter-tomcat")
-	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	testImplementation("org.springframework.boot:spring-boot-starter-test") {
+		exclude(group = "org.junit.vintage")
+		exclude(module = "mockito-core")
+	}
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
 	testImplementation("org.mockito:mockito-core:5.5.0")
 	testImplementation("org.mockito:mockito-junit-jupiter:5.5.0")
@@ -56,6 +59,8 @@ dependencies {
 	implementation("io.grpc:grpc-stub:1.63.0")
 
 	implementation("com.cloudinary:cloudinary-http44:1.34.0")
+
+	testImplementation("io.mockk:mockk:1.13.7")
 }
 
 kotlin {

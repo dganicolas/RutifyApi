@@ -18,12 +18,9 @@ import org.springframework.stereotype.Service
 import java.time.LocalDate
 
 @Service
-class EstadisticasService {
-
-    @Autowired
-    private lateinit var estadisticasRepository: IEstadisticasRepository
-    @Autowired
-    private lateinit var estadisticasDiariasRepository: IEstadisticasDiariasRepository
+class EstadisticasService(
+    private val estadisticasRepository: IEstadisticasRepository
+) {
 
     fun crearEstadisticas(estadisticas: Estadisticas, authentication: Authentication): ResponseEntity<EstadisticasDto> {
 

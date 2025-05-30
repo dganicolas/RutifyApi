@@ -17,13 +17,10 @@ import java.time.temporal.ChronoUnit
 import kotlin.random.Random
 
 @Service
-class EjerciciosService {
-
-    @Autowired
-    private lateinit var ejerciciosRepository: IEjercicioRepository
-
-    @Autowired
-    private lateinit var mongoTemplate: MongoTemplate
+class EjerciciosService(
+    private val ejerciciosRepository: IEjercicioRepository,
+    private val mongoTemplate: MongoTemplate
+) {
 
     fun crearEjercicio(ejercicioDTO: EjercicioDTO): ResponseEntity<Ejercicio> {
         validarEjercicio(ejercicioDTO)

@@ -25,22 +25,13 @@ import org.springframework.security.core.Authentication
 import org.springframework.stereotype.Service
 
 @Service
-class RutinaService {
-
-    @Autowired
-    private lateinit var rutinaRepository: IRutinasRepository
-
-    @Autowired
-    private lateinit var ejercicioRepository: IEjercicioRepository
-
-    @Autowired
-    private lateinit var usuariosRepository: IUsuarioRepository
-
-    @Autowired
-    lateinit var emailService: EmailService
-
-    @Autowired
-    private lateinit var mongoTemplate: MongoTemplate
+class RutinaService(
+    private val rutinaRepository: IRutinasRepository,
+    private val ejercicioRepository: IEjercicioRepository,
+    usuariosRepository: IUsuarioRepository,
+    private val emailService: EmailService,
+    private val mongoTemplate: MongoTemplate
+):ServiceBase(usuariosRepository) {
 
 
 
@@ -116,7 +107,7 @@ class RutinaService {
 
     fun eliminarRutina(idRutina: String, authentication: Authentication): ResponseEntity<Void> {
 
-        val usuario = usuariosRepository.findByIdFirebase(authentication.name) ?: throw NotFoundException("El usuario ${authentication.name} no existe ")
+        val usuario = usuarioRepository.findByIdFirebase(authentication.name) ?: throw NotFoundException("El usuario ${authentication.name} no existe ")
         val rutina = rutinaRepository.findById(idRutina).orElseThrow { NotFoundException("No se encontró la rutina con ID: $idRutina") }!!
 
         if (rutina.creadorId != authentication.name && usuario.rol != "admin") throw UnauthorizedException("No tienes permiso para crear este voto a otro usuario")

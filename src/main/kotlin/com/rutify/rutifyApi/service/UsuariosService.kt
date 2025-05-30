@@ -35,21 +35,14 @@ import java.time.LocalDate
 import java.time.Period
 
 @Service
-class UsuariosService {
-
-    @Autowired
-    lateinit var usuarioRepository: IUsuarioRepository
-    @Autowired
-    lateinit var estadisticasRepository: IEstadisticasRepository
-
-    @Autowired
-    lateinit var emailService: EmailService
-
-    @Autowired
-    lateinit var rutinaRepository: IRutinasRepository
-
-    @Value("\${firebase.apikey}")
-    lateinit var apiKey: String
+class UsuariosService(
+    usuarioRepository: IUsuarioRepository,
+    val estadisticasRepository: IEstadisticasRepository,
+    val emailService: EmailService,
+    val rutinaRepository: IRutinasRepository,
+    @Value("\${firebase.apikey}") val apiKey: String,
+    val firebaseAuth: FirebaseAuth
+) : ServiceBase(usuarioRepository) {
 
     fun registrarUsuario(usuario: UsuarioRegistroDTO): ResponseEntity<UsuarioregistradoDto> {
         return try {
@@ -60,7 +53,7 @@ class UsuariosService {
             val request = UserRecord.CreateRequest()
                 .setEmail(usuario.correo)
                 .setPassword(usuario.contrasena)
-            val userRecord = FirebaseAuth.getInstance().createUser(request)
+            val userRecord = getFirebaseAuthInstance().createUser(request)
 
             val nuevoUsuario = Usuario(
                 idFirebase = userRecord.uid,
@@ -82,7 +75,7 @@ class UsuariosService {
         }
     }
 
-    private fun validarUsuarioRegistro(usuario: UsuarioRegistroDTO): String? {
+    fun validarUsuarioRegistro(usuario: UsuarioRegistroDTO): String? {
 
         if (usuario.nombre.isBlank()) {
             return "El nombre no puede estar vacío"
@@ -102,7 +95,7 @@ class UsuariosService {
             return "La edad no puede ser menor a 16 años"
         }
 
-        if (usuario.sexo != "H" && usuario.sexo != "M") {
+        if (usuario.sexo != "H" && usuario.sexo != "M" && usuario.sexo != "O") {
             return "El sexo debe ser 'H' (hombre), 'M' (mujer) O 'O' (otro sexo)"
         }
 
@@ -122,7 +115,7 @@ class UsuariosService {
             "returnSecureToken" to true
         )
 
-        val client = HttpClient.newHttpClient()
+        val client = createHttpClient()
         val request = HttpRequest.newBuilder()
             .uri(URI.create(url))
             .header("Content-Type", "application/json")
@@ -158,13 +151,13 @@ class UsuariosService {
         return ResponseEntity.noContent().build()
     }
 
-    private fun eliminarDeFirestore(uidUsuarioABorrar: String) {
-        val autorizacion = FirebaseAuth.getInstance()
+    fun eliminarDeFirestore(uidUsuarioABorrar: String) {
+        val autorizacion = getFirebaseAuthInstance()
         autorizacion.revokeRefreshTokens(uidUsuarioABorrar)
         autorizacion.deleteUser(uidUsuarioABorrar)
     }
 
-    private fun eliminarDeMongoDb(correo: String) {
+    fun eliminarDeMongoDb(correo: String) {
         val usuario = usuarioRepository.findByCorreo(correo)
         if (usuario != null) {
             usuarioRepository.delete(usuario)

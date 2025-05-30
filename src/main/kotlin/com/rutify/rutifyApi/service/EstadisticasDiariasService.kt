@@ -13,10 +13,9 @@ import org.springframework.stereotype.Service
 import java.time.LocalDate
 
 @Service
-class EstadisticasDiariasService {
-    @Autowired
-    private lateinit var estadisticasDiariasRepository: IEstadisticasDiariasRepository
-
+class EstadisticasDiariasService(
+    private val estadisticasDiariasRepository: IEstadisticasDiariasRepository
+) {
     fun obtenerEstadisticasDiariasDeUnMes(idFirebase: String, fecha: LocalDate): ResponseEntity<List<EstadisticasDiariasDto>> {
         val fechaInicio = fecha.withDayOfMonth(1)
         val fechaFin = fechaInicio.withDayOfMonth(fechaInicio.lengthOfMonth())
