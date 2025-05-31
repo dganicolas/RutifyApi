@@ -29,5 +29,7 @@ data class Usuario(
     @Field
     var perfilPublico: Boolean = true,
     @Field
+    var reportes: Int = 0,
+    @Field
     var rol:String
 )

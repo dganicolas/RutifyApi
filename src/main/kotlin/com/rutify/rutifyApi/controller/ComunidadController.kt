@@ -4,6 +4,7 @@ import com.rutify.rutifyApi.dto.ComentarioDto
 import com.rutify.rutifyApi.iService.IComunidadService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
+import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 
@@ -43,12 +44,22 @@ class ComunidadController {
         return ResponseEntity.ok(nuevaRespuesta)
     }
 
-    @DeleteMapping("/comentarios/{id}")
+    @DeleteMapping("/comentarios")
     fun eliminarComentario(
-        @PathVariable id: String,
-        authentication: org.springframework.security.core.Authentication
+        @RequestBody comentario:ComentarioDto,
+        authentication: Authentication
     ): ResponseEntity<Void> {
-        comunidadService.eliminarComentario(id, authentication)
+        comunidadService.eliminarComentario(comentario, authentication)
         return ResponseEntity.noContent().build()
     }
+
+    @PutMapping("/comentarios/aprobar")
+    fun aprobarComentario(
+        @RequestBody comentario: ComentarioDto,
+        authentication: Authentication
+    ): ResponseEntity<Void> {
+        comunidadService.aprobarComentario(comentario, authentication)
+        return ResponseEntity.noContent().build()
+    }
+
 }

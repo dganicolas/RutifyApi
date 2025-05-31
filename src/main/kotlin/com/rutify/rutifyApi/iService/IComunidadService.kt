@@ -9,5 +9,7 @@ interface IComunidadService {
     fun obtenerComentarios(): List<ComentarioDto>
     fun obtenerRespuestas(idComentarioPadre: String): List<ComentarioDto>
     fun responderComentario(respuestaDto: ComentarioDto): ComentarioDto
-    fun eliminarComentario(id: String, authentication: Authentication)
+    fun eliminarComentario(comentario:ComentarioDto, authentication: Authentication)
+    fun aprobarComentario(comentario:ComentarioDto, authentication: Authentication)
+
 }

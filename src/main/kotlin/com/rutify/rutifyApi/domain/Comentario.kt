@@ -24,5 +24,7 @@ data class Comentario(
     @Field
     val imagenUrl: String? = null,
     @Field
+    var estado: Boolean? = null,
+    @Field
     val idComentarioPadre: String? = null // Para respuestas
 )

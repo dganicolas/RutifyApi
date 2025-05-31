@@ -133,4 +133,18 @@ object DTOMapper {
             idComentarioPadre = comentario.idComentarioPadre
         )
     }
+
+    fun ComnetarioDtoToComentario(comentario: ComentarioDto): Comentario {
+        return Comentario(
+            _id = comentario._id,
+            idFirebase = comentario.idFirebase,
+            nombreUsuario = comentario.nombreUsuario,
+            imagenUrl = comentario.imagenUrl,
+            avatarUrl = comentario.avatarUrl,
+            fechaPublicacion = comentario.fechaPublicacion,
+            estadoAnimo = comentario.estadoAnimo,
+            texto = comentario.texto,
+            idComentarioPadre = comentario.idComentarioPadre
+        )
+    }
 }

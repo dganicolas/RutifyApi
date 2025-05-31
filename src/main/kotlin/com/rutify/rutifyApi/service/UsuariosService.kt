@@ -13,9 +13,7 @@ import com.rutify.rutifyApi.exception.exceptions.FirebaseUnavailableException
 import com.rutify.rutifyApi.exception.exceptions.NotFoundException
 import com.rutify.rutifyApi.exception.exceptions.UnauthorizedException
 import com.rutify.rutifyApi.exception.exceptions.ValidationException
-import com.rutify.rutifyApi.repository.IEstadisticasRepository
-import com.rutify.rutifyApi.repository.IRutinasRepository
-import com.rutify.rutifyApi.repository.IUsuarioRepository
+import com.rutify.rutifyApi.repository.*
 import com.rutify.rutifyApi.utils.AuthUtils
 import com.rutify.rutifyApi.utils.DTOMapper
 import org.springframework.beans.factory.annotation.Autowired
@@ -40,6 +38,8 @@ class UsuariosService(
     val estadisticasRepository: IEstadisticasRepository,
     val emailService: EmailService,
     val rutinaRepository: IRutinasRepository,
+    val comentarioRepository: ComentarioRepository,
+    val votosRepository: IVotosRepository,
     @Value("\${firebase.apikey}") val apiKey: String,
     val firebaseAuth: FirebaseAuth
 ) : ServiceBase(usuarioRepository) {
@@ -169,9 +169,6 @@ class UsuariosService(
     fun obtenerDetalleUsuario(idFirebase: String, authentication: Authentication): ResponseEntity<UsuarioInformacionDto> {
         val usuario = usuarioRepository.findByIdFirebase(idFirebase)
             ?: throw NotFoundException("Usuario no encontrado")
-        val estadisticas = estadisticasRepository.findByIdFirebase(idFirebase) ?:
-        Estadisticas(null,"",0.0, 0.0,0.0 , 0.0, 0.0, 0.0,0.0, 0, 0.0)
-        val totalRutinas = rutinaRepository.countByCreadorId(idFirebase)
         if (usuario.perfilPublico || usuario.idFirebase == authentication.name) {
             return ResponseEntity.ok(
                 UsuarioInformacionDto(
@@ -181,9 +178,11 @@ class UsuariosService(
                     sexo = usuario.sexo,
                     esPremium = usuario.esPremium,
                     avatarUrl = usuario.avatar,
-                    estadisticas = DTOMapper.estadisticasToEstadisticasDto(estadisticas),
-                    countRutinas = totalRutinas,
-                    fechaUltimoReto = usuario.fechaUltimoReto
+                    estadisticas = DTOMapper.estadisticasToEstadisticasDto(estadisticasRepository.findByIdFirebase(idFirebase) ?: Estadisticas(null,"",0.0, 0.0,0.0 , 0.0, 0.0, 0.0,0.0, 0, 0.0)),
+                    countRutinas = rutinaRepository.countByCreadorId(idFirebase),
+                    fechaUltimoReto = usuario.fechaUltimoReto,
+                    countComentarios = comentarioRepository.countByIdFirebaseAndIdComentarioPadreIsNull(idFirebase),
+                    countVotos = votosRepository.countByIdFirebase(idFirebase)
                 )
             )
         }else{
@@ -264,7 +263,7 @@ class UsuariosService(
     fun EsAdmin(idFirebase: String): ResponseEntity<Boolean> {
         val usuario = usuarioRepository.findByIdFirebase(idFirebase)
             ?: throw NotFoundException("Usuario no encontrado")
-
+        print(usuario.rol == "admin")
         return ResponseEntity.ok(usuario.rol == "admin")
     }
 

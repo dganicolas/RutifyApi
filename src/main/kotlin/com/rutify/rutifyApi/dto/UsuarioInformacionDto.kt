@@ -11,5 +11,7 @@ data class UsuarioInformacionDto(
     val avatarUrl: String,
     var fechaUltimoReto: LocalDate,
     val estadisticas: EstadisticasDto,
-    val countRutinas: Long
+    val countRutinas: Long,
+    val countComentarios: Long,
+    val countVotos: Long
 )

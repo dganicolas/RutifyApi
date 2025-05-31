@@ -1,5 +1,7 @@
 package com.rutify.rutifyApi.service
 
+import com.cloudinary.Cloudinary
+import com.cloudinary.utils.ObjectUtils
 import com.rutify.rutifyApi.controller.CloudinaryService
 import com.rutify.rutifyApi.domain.Comentario
 import com.rutify.rutifyApi.dto.ComentarioDto
@@ -9,7 +11,6 @@ import com.rutify.rutifyApi.iService.IComunidadService
 import com.rutify.rutifyApi.repository.ComentarioRepository
 import com.rutify.rutifyApi.repository.IUsuarioRepository
 import com.rutify.rutifyApi.utils.DTOMapper
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.core.Authentication
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
@@ -18,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile
 class ComunidadService(
     private val comentarioRepository: ComentarioRepository,
     private val cloudinaryService: CloudinaryService,
+    private val cloudinary: Cloudinary,
     usuariosRepository: IUsuarioRepository,
 ) : ServiceBase(usuariosRepository), IComunidadService {
 
@@ -38,14 +40,16 @@ class ComunidadService(
                     imagenUrl = imagenUrl,
                     estadoAnimo = comentarioDto.estadoAnimo,
                     texto = comentarioDto.texto,
-                    idComentarioPadre = null
+                    idComentarioPadre = null,
+                    estado = if(imagenUrl == null) null else false
                 )
             )
         )
     }
 
     override fun obtenerComentarios(): List<ComentarioDto> {
-        return comentarioRepository.findByIdComentarioPadreIsNull()
+        //comprobar si la imagen tienen estado null es ecir no comprbad
+        return comentarioRepository.findByIdComentarioPadreIsNullAndEstadoIsNull()
             .map { DTOMapper.ComentarioToComentarioDto(it) }.reversed()
     }
 
@@ -76,24 +80,43 @@ class ComunidadService(
             )
         )
     }
+    fun extraerPublicId(imagenUrl: String?): String? {
+        if (imagenUrl == null) return null
+        val afterUpload = imagenUrl.substringAfter("/upload/").substringAfter("/")
+        return afterUpload.substringBeforeLast(".")
+    }
 
-    override fun eliminarComentario(id: String, authentication: Authentication) {
-        val comentario = comentarioRepository.findById(id)
+    override fun eliminarComentario(comentario:ComentarioDto, authentication: Authentication) {
+        val imagenUrl = extraerPublicId(comentario.imagenUrl)
+        val comentarioexistente = comentarioRepository.findById(comentario._id!!)
             .orElseThrow { NotFoundException("Comentario no encontrado") }
 
         val usuario = obtenerUsuario(authentication.name)
 
         val esAdmin = usuario.rol == "admin"
 
-        val esAutorDelPadre = comentario.idComentarioPadre?.let { idPadre ->
+        val esAutorDelPadre = comentarioexistente.idComentarioPadre?.let { idPadre ->
             val comentarioPadre = comentarioRepository.findById(idPadre).orElse(null)
             comentarioPadre?.idFirebase == authentication.name
         } ?: false
 
-        if (esAutorDelPadre && comentario.idFirebase != authentication.name && !esAdmin) {
+        if (esAutorDelPadre && comentarioexistente.idFirebase != authentication.name && !esAdmin) {
             throw UnauthorizedException("No tienes autorización para eliminar este comentario")
         }
+        if (imagenUrl != null && imagenUrl.contains("res.cloudinary.com"))  cloudinary.uploader().destroy(imagenUrl, ObjectUtils.emptyMap())
+        comentarioRepository.deleteByIdComentarioPadreEquals(comentarioexistente._id!!)
+        comentarioRepository.delete(comentarioexistente)
+    }
 
-        comentarioRepository.deleteById(id)
+    override fun aprobarComentario(comentario:ComentarioDto, authentication: Authentication) {
+        val usuario = obtenerUsuario(authentication.name)
+        if (usuario.rol != "admin") throw UnauthorizedException("No tienes permiso para aprobar comentarios")
+
+
+        val comentarioexistente = comentarioRepository.findById(comentario._id!!)
+            .orElseThrow { NotFoundException("Comentario no encontrado") }
+
+        comentarioexistente.estado = true
+        comentarioRepository.save(comentarioexistente)
     }
 }
