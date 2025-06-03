@@ -1,3 +1,7 @@
 /gradlew text eol=lf
 *.bat text eol=crlf
 *.jar binary
+*.psd filter=lfs diff=lfs merge=lfs -text
+file.psd filter=lfs diff=lfs merge=lfs -text
+*.war filter=lfs diff=lfs merge=lfs -text
+C:UsersnicolDocumentsTFGrutifyApibuildlibsrutifyApi-0.0.1-SNAPSHOT.war filter=lfs diff=lfs merge=lfs -text

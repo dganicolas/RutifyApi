@@ -1,4 +1,4 @@
-FROM amazoncorretto:17-alpine-jdk
+FROM azul/zulu-openjdk:17-latest
 VOLUME /tmp
-COPY build/libs/*.war rutifyApi-0.0.1-SNAPSHOT-plain.war
-CMD ["java", "-jar", "/rutifyApi-0.0.1-SNAPSHOT-plain.war"]
+COPY build/libs/*.war app.war
+CMD ["java", "-jar", "/app.war"]
