@@ -13,9 +13,7 @@ import com.rutify.rutifyApi.exception.exceptions.FirebaseUnavailableException
 import com.rutify.rutifyApi.exception.exceptions.NotFoundException
 import com.rutify.rutifyApi.exception.exceptions.UnauthorizedException
 import com.rutify.rutifyApi.exception.exceptions.ValidationException
-import com.rutify.rutifyApi.repository.IEstadisticasRepository
-import com.rutify.rutifyApi.repository.IRutinasRepository
-import com.rutify.rutifyApi.repository.IUsuarioRepository
+import com.rutify.rutifyApi.repository.*
 import com.rutify.rutifyApi.utils.AuthUtils
 import io.mockk.*
 import org.junit.jupiter.api.AfterEach
@@ -43,6 +41,9 @@ class UsuariosServiceTest {
     private val rutinaRepository = mockk<IRutinasRepository>()
     private val firebaseAuthMock = mockk<FirebaseAuth>(relaxed = true)
     private val httpClientMock = mockk<HttpClient>(relaxed = true)
+    private val comentarioRepositoryMock = mockk<ComentarioRepository>(relaxed = true)
+    private val votoRepository = mockk<IVotosRepository>(relaxed = true)
+    private val mensajeService = mockk<MensajesService>(relaxed = true)
     private val apiKey = "fake-api-key"
 
     // Clase de prueba que sobrescribe los métodos protegidos
@@ -51,6 +52,9 @@ class UsuariosServiceTest {
         estadisticasRepository,
         emailService,
         rutinaRepository,
+        comentarioRepositoryMock,
+        votoRepository,
+        mensajeService,
         apiKey,
         firebaseAuthMock
     ) {
@@ -413,8 +417,7 @@ class UsuariosServiceTest {
         val response = usuariosService.buscarUsuariosPorNombre(nombreBuscado, pagina, tamano)
 
         assertEquals(HttpStatus.OK, response.statusCode)
-        assertEquals(2, response.body?.usuarios?.size)
-        assertTrue(response.body?.hasNext == true)
+        assertEquals(2, response.body?.size)
     }
     @Test
     fun buscarUsuariosPorNombre_sinResultados_devuelveListaVacia() {
@@ -433,8 +436,7 @@ class UsuariosServiceTest {
         val response = usuariosService.buscarUsuariosPorNombre(nombreBuscado, pagina, tamano)
 
         assertEquals(HttpStatus.OK, response.statusCode)
-        assertEquals(0, response.body?.usuarios?.size)
-        assertFalse(response.body?.hasNext == true)
+        assertEquals(0, response.body?.size)
     }
     @Test
     fun buscarUsuariosPorNombre_ultimaPagina_hasNextFalse() {
@@ -457,8 +459,7 @@ class UsuariosServiceTest {
         val response = usuariosService.buscarUsuariosPorNombre(nombreBuscado, pagina, tamano)
 
         assertEquals(HttpStatus.OK, response.statusCode)
-        assertEquals(1, response.body?.usuarios?.size)
-        assertFalse(response.body?.hasNext == true)
+        assertEquals(1, response.body?.size)
     }
 
 
