@@ -38,7 +38,7 @@ class FirebaseConfig {
         val serviceAccount = ByteArrayInputStream(gson.toJson(jsonObject).toByteArray())
         val credentials = GoogleCredentials.fromStream(serviceAccount)
 
-        val options = FirebaseOptions.Builder()
+        val options = FirebaseOptions.builder()
             .setCredentials(credentials)
             .setProjectId(firebaseProperties.projectId)
             .build()
