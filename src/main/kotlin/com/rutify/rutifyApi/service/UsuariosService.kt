@@ -204,10 +204,11 @@ class UsuariosService(
 
         return ResponseEntity.ok(usuarios)
     }
-    fun añadirMonedas(idFirebase: String,coins:Int){
+    fun anadirMonedas(idFirebase: String,coins:Int){
         val usuario = usuarioRepository.findByIdFirebase(idFirebase)
             ?: throw NotFoundException(mensajesService.obtenerMensaje("UsuarioNoEncontrado"))
-        usuario.monedas += monedas
+        usuario.monedas += coins
+        usuarioRepository.save(usuario)
     }
 
 

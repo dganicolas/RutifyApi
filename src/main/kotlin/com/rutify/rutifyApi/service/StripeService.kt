@@ -8,8 +8,12 @@ import com.stripe.model.PaymentIntent
 import com.stripe.net.Webhook
 import com.stripe.param.PaymentIntentCreateParams
 import org.springframework.http.ResponseEntity
+import org.springframework.stereotype.Service
 
-class StripeService {
+@Service
+class StripeService(
+    private val usuariosService: UsuariosService
+) {
         fun crearPago(request: PaymentRequestDto): PaymentResponse {
             val eurPerCoin = 0.01 // 1 moneda = 0.01€
             val amountInCents = (request.coins * eurPerCoin * 100).toLong()
@@ -45,14 +49,9 @@ class StripeService {
             if (event.type == "payment_intent.succeeded") {
                 val intent = event.dataObjectDeserializer.`object`.get() as PaymentIntent
 
-                // Extrae la cantidad pagada (opcional)
-                val amount = intent.amount // en centavos
                 val userId = intent.metadata["userId"] ?: return ResponseEntity.badRequest().body("No userId in metadata")
-
-                val coins = (amount ?: 0) / 1 // En tu caso 1 moneda = 1 céntimo
-
-                // Aquí haces la lógica para actualizar MongoDB y asignar las monedas al usuario
-                // ejemplo: userRepository.addCoins(userId, coins)
+                val coins = intent.metadata["coins"] ?: return ResponseEntity.badRequest().body("No userId in metadata")
+                usuariosService.anadirMonedas(userId,coins.toInt())
 
                 println("✅ Pago exitoso. Se añadieron $coins monedas al usuario $userId.")
             }
