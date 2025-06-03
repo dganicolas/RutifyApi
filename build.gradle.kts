@@ -10,6 +10,10 @@ plugins {
 group = "com.rutify"
 version = "0.0.1-SNAPSHOT"
 
+tasks.named<War>("war") {
+	archiveFileName.set("app.war")
+}
+
 java {
 	toolchain {
 		languageVersion = JavaLanguageVersion.of(17)
