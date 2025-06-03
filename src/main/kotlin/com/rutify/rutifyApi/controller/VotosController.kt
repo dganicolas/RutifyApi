@@ -30,8 +30,13 @@ class VotosController {
         return votosService.actualizarVotos(voto, authentication)
     }
 
-    @DeleteMapping("eliminarVoto")
-    fun eliminarVoto(@RequestBody voto: VotodDto, authentication: Authentication): ResponseEntity<Void> {
-        return votosService.eliminarVoto(voto, authentication)
+    @DeleteMapping("eliminarVoto/{idVoto}")
+    fun eliminarVoto(@PathVariable idVoto: String, authentication: Authentication): ResponseEntity<Unit> {
+        return votosService.eliminarVoto(idVoto, authentication)
+    }
+
+    @GetMapping("/autor/{creadorId}")
+    fun obtenerVotosPorAutor(@PathVariable creadorId: String): ResponseEntity<List<VotodDto>> {
+        return votosService.obtenerComentariosPorAutor(creadorId)
     }
 }

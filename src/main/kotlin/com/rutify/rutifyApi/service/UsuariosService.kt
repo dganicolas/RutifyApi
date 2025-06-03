@@ -1,7 +1,6 @@
 package com.rutify.rutifyApi.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.google.cloud.firestore.Firestore
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.auth.UserRecord
@@ -16,9 +15,7 @@ import com.rutify.rutifyApi.exception.exceptions.ValidationException
 import com.rutify.rutifyApi.repository.*
 import com.rutify.rutifyApi.utils.AuthUtils
 import com.rutify.rutifyApi.utils.DTOMapper
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpStatus
@@ -26,7 +23,6 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.core.Authentication
 import org.springframework.stereotype.Service
 import java.net.URI
-import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 import java.time.LocalDate
@@ -40,6 +36,7 @@ class UsuariosService(
     val rutinaRepository: IRutinasRepository,
     val comentarioRepository: ComentarioRepository,
     val votosRepository: IVotosRepository,
+    private val mensajesService: MensajesService,
     @Value("\${firebase.apikey}") val apiKey: String,
     val firebaseAuth: FirebaseAuth
 ) : ServiceBase(usuarioRepository) {
@@ -136,7 +133,7 @@ class UsuariosService(
         }
     }
 
-    fun eliminarUsuarioPorCorreo(correo: String, authentication: Authentication): ResponseEntity<Void> {
+    fun eliminarUsuarioPorCorreo(correo: String, authentication: Authentication): ResponseEntity<Unit> {
         val uidActual = authentication.name // UID desde el JWT
 
         // Buscar en Firebase Firestore por correo
@@ -168,7 +165,7 @@ class UsuariosService(
 
     fun obtenerDetalleUsuario(idFirebase: String, authentication: Authentication): ResponseEntity<UsuarioInformacionDto> {
         val usuario = usuarioRepository.findByIdFirebase(idFirebase)
-            ?: throw NotFoundException("Usuario no encontrado")
+            ?: throw NotFoundException(mensajesService.obtenerMensaje("UsuarioNoEncontrado"))
         if (usuario.perfilPublico || usuario.idFirebase == authentication.name) {
             return ResponseEntity.ok(
                 UsuarioInformacionDto(
@@ -191,7 +188,7 @@ class UsuariosService(
 
     }
 
-    fun buscarUsuariosPorNombre(nombre: String, pagina: Int, tamano: Int): ResponseEntity<BusquedaUsuariosRespuesta> {
+    fun buscarUsuariosPorNombre(nombre: String, pagina: Int, tamano: Int): ResponseEntity<List<UsuarioBusquedaDto>> {
         val pageable: Pageable = PageRequest.of(pagina, tamano)
         val paginaUsuarios = usuarioRepository.findByNombreContainsAndPerfilPublicoTrue(nombre, pageable)
 
@@ -205,12 +202,12 @@ class UsuariosService(
             )
         }
 
-        return ResponseEntity.ok(
-            BusquedaUsuariosRespuesta(
-                usuarios = usuarios,
-                hasNext = paginaUsuarios.hasNext()
-            )
-        )
+        return ResponseEntity.ok(usuarios)
+    }
+    fun añadirMonedas(idFirebase: String,coins:Int){
+        val usuario = usuarioRepository.findByIdFirebase(idFirebase)
+            ?: throw NotFoundException(mensajesService.obtenerMensaje("UsuarioNoEncontrado"))
+        usuario.monedas += monedas
     }
 
 
@@ -220,9 +217,9 @@ class UsuariosService(
             ?: throw NotFoundException("Usuario solicitante no encontrado")
         // Buscar el usuario por correo
         val usuarioACambiar = usuarioRepository.findByCorreo(actualizarUsuarioDTO.correo)
-            ?: throw NotFoundException("Usuario no encontrado")
+            ?: throw NotFoundException(mensajesService.obtenerMensaje("UsuarioNoEncontrado"))
 
-        if (usuarioSolicitante.rol == "admin" || usuarioACambiar.correo != actualizarUsuarioDTO.correo) {
+        if (usuarioSolicitante.rol != "admin" || usuarioACambiar.correo != actualizarUsuarioDTO.correo) {
             throw UnauthorizedException("No tienes permiso para actualizar este perfil.")
         }
         val error = validarActualizarUsuarioDTO(actualizarUsuarioDTO)
@@ -262,14 +259,14 @@ class UsuariosService(
 
     fun EsAdmin(idFirebase: String): ResponseEntity<Boolean> {
         val usuario = usuarioRepository.findByIdFirebase(idFirebase)
-            ?: throw NotFoundException("Usuario no encontrado")
+            ?: throw NotFoundException(mensajesService.obtenerMensaje("UsuarioNoEncontrado"))
         print(usuario.rol == "admin")
         return ResponseEntity.ok(usuario.rol == "admin")
     }
 
     fun marcarRetoDiario(authentication: Authentication): ResponseEntity<Boolean> {
         val idFirebase = authentication.name
-        val usuario = usuarioRepository.findByIdFirebase(idFirebase)?: throw NotFoundException("Usuario no encontrado")
+        val usuario = usuarioRepository.findByIdFirebase(idFirebase)?: throw NotFoundException(mensajesService.obtenerMensaje("UsuarioNoEncontrado"))
 
         val hoy = LocalDate.now()
         val fechaUltimoReto = usuario.fechaUltimoReto

@@ -9,4 +9,6 @@ interface ComentarioRepository : MongoRepository<Comentario, String> {
     fun findByEstadoIsFalse(): List<Comentario>
     fun deleteByIdComentarioPadreEquals(id: String): Long
     fun countByIdFirebaseAndIdComentarioPadreIsNull(idUsuario: String): Long
+    fun findAllByIdFirebaseAndIdComentarioPadreIsNull(idFirebase: String): List<Comentario>
+    fun findAllByNombreUsuarioContainingIgnoreCase(nombre: String): List<Comentario>
 }

@@ -7,4 +7,5 @@ interface IVotosRepository : MongoRepository<Voto, String> {
     fun findByIdFirebaseAndIdRutina(idFirebase: String, idRutina: String): Voto?
     fun findByIdRutina(idRutina: String): List<Voto>
     fun countByIdFirebase(idFirebase: String): Long
+    fun findAllByIdFirebase(creadorId: String): List<Voto>
 }

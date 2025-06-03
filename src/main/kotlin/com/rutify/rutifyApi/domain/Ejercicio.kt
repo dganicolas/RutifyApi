@@ -1,6 +1,5 @@
 package com.rutify.rutifyApi.domain
 
-import org.bson.types.ObjectId
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.Field
@@ -8,7 +7,7 @@ import org.springframework.data.mongodb.core.mapping.Field
 @Document(collection = "Ejercicios")
 data class Ejercicio(
     @Id
-    val id: String?,
+    val id: String? = null,
     @Field
     val nombreEjercicio: String,
     @Field

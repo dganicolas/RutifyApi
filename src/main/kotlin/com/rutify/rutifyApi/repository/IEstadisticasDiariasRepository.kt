@@ -1,6 +1,5 @@
 package com.rutify.rutifyApi.repository
 
-import com.rutify.rutifyApi.domain.Estadisticas
 import com.rutify.rutifyApi.domain.EstadisticasDiarias
 import org.springframework.data.mongodb.repository.MongoRepository
 import java.time.LocalDate
@@ -15,4 +14,5 @@ interface IEstadisticasDiariasRepository : MongoRepository<EstadisticasDiarias, 
     ): List<EstadisticasDiarias>
 
     fun findTop5ByIdFirebase(idFirebase: String): List<EstadisticasDiarias>
+    fun findTopByIdFirebaseAndFechaBeforeOrderByFechaDesc(idFirebase: String, fecha: LocalDate): EstadisticasDiarias?
 }

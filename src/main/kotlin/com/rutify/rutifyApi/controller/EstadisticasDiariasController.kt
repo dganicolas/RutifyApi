@@ -15,13 +15,6 @@ class EstadisticasDiariasController {
 
     @Autowired
     private lateinit var estadisticasDiariasService:  EstadisticasDiariasService
-    @GetMapping("/mes")
-    fun obtenerEstadisticasDiariasDeUnMes(
-        @RequestParam idFirebase: String,
-        @RequestParam fecha: LocalDate
-    ): ResponseEntity<List<EstadisticasDiariasDto>> {
-        return estadisticasDiariasService.obtenerEstadisticasDiariasDeUnMes(idFirebase,fecha)
-    }
 
     @GetMapping("/ultimosPesos")
     fun obtenerUltimos5Pesos(

@@ -34,19 +34,6 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
-	developmentOnly("org.springframework.boot:spring-boot-devtools")
-	runtimeOnly("com.mysql:mysql-connector-j")
-	providedRuntime("org.springframework.boot:spring-boot-starter-tomcat")
-	testImplementation("org.springframework.boot:spring-boot-starter-test") {
-		exclude(group = "org.junit.vintage")
-		exclude(module = "mockito-core")
-	}
-	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
-	testImplementation("org.mockito:mockito-core:5.5.0")
-	testImplementation("org.mockito:mockito-junit-jupiter:5.5.0")
-	testImplementation("org.mockito.kotlin:mockito-kotlin:5.1.0")
-	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-
 	implementation("com.google.firebase:firebase-admin:9.4.3")
 	implementation("com.google.firebase:firebase-firestore:25.1.3")
 
@@ -61,6 +48,22 @@ dependencies {
 	implementation("com.cloudinary:cloudinary-http44:1.34.0")
 
 	testImplementation("io.mockk:mockk:1.13.7")
+	developmentOnly("org.springframework.boot:spring-boot-devtools")
+	runtimeOnly("com.mysql:mysql-connector-j")
+	providedRuntime("org.springframework.boot:spring-boot-starter-tomcat")
+	testImplementation("org.springframework.boot:spring-boot-starter-test") {
+		exclude(group = "org.junit.vintage")
+		exclude(module = "mockito-core")
+	}
+	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
+	testImplementation("org.mockito:mockito-core:5.5.0")
+	testImplementation("org.mockito:mockito-junit-jupiter:5.5.0")
+	testImplementation("org.mockito.kotlin:mockito-kotlin:5.1.0")
+	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
+	implementation("com.stripe:stripe-java:24.0.0")
+
+
 }
 
 kotlin {

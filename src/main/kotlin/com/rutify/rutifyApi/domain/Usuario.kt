@@ -31,5 +31,7 @@ data class Usuario(
     @Field
     var reportes: Int = 0,
     @Field
-    var rol:String
+    var rol:String,
+    @Field
+    var monedas:Int = 0
 )

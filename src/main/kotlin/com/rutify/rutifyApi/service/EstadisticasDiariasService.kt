@@ -6,8 +6,6 @@ import com.rutify.rutifyApi.dto.EstadisticasDiariasPatchDto
 import com.rutify.rutifyApi.exception.exceptions.NotFoundException
 import com.rutify.rutifyApi.repository.IEstadisticasDiariasRepository
 import com.rutify.rutifyApi.utils.DTOMapper.estadisticasDiariasToDto
-import com.rutify.rutifyApi.utils.DTOMapper.listaEstadisticasDiariasToDto
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import java.time.LocalDate
@@ -16,15 +14,6 @@ import java.time.LocalDate
 class EstadisticasDiariasService(
     private val estadisticasDiariasRepository: IEstadisticasDiariasRepository
 ) {
-    fun obtenerEstadisticasDiariasDeUnMes(idFirebase: String, fecha: LocalDate): ResponseEntity<List<EstadisticasDiariasDto>> {
-        val fechaInicio = fecha.withDayOfMonth(1)
-        val fechaFin = fechaInicio.withDayOfMonth(fechaInicio.lengthOfMonth())
-
-        val resultados = estadisticasDiariasRepository
-            .findByIdFirebaseAndFechaBetween(idFirebase, fechaInicio, fechaFin)
-
-        return ResponseEntity.ok(listaEstadisticasDiariasToDto(resultados))
-    }
 
     fun obtenerEstadisticasDiariasDia(idFirebase: String, fecha: LocalDate): ResponseEntity<EstadisticasDiariasDto?> {
         val resultado = estadisticasDiariasRepository.findByIdFirebaseAndFecha(idFirebase, fecha)
@@ -33,15 +22,34 @@ class EstadisticasDiariasService(
     }
 
     fun findByIdFirebaseAndFecha(idFirebase: String, fecha: LocalDate, patch: EstadisticasDiariasPatchDto): ResponseEntity<EstadisticasDiariasDto> {
-        val existente = estadisticasDiariasRepository
-            .findByIdFirebaseAndFecha(idFirebase, fecha)
-            ?: EstadisticasDiarias(null,idFirebase,fecha,0.0,0.0,0,0.0)
-        val actualizada = existente.copy(
-            horasActivo = patch.horasActivo?.let { existente.horasActivo + it } ?: existente.horasActivo,
-            ejerciciosRealizados = patch.ejerciciosRealizados?.let { existente.ejerciciosRealizados + it } ?: existente.ejerciciosRealizados,
-            kCaloriasQuemadas = patch.kCaloriasQuemadas?.let { existente.kCaloriasQuemadas + it } ?: existente.kCaloriasQuemadas,
-            pesoCorporal = patch.pesoCorporal ?: existente.pesoCorporal,
+        // Buscamos el registro existente para esa fecha
+        val existente = estadisticasDiariasRepository.findByIdFirebaseAndFecha(idFirebase, fecha)
+
+        // Si no existe, buscamos el último registro anterior para ese usuario
+        val pesoAnterior = if (existente == null) {
+            val ultimoAnterior = estadisticasDiariasRepository
+                .findTopByIdFirebaseAndFechaBeforeOrderByFechaDesc(idFirebase, fecha)?.pesoCorporal ?: 0.0
+            ultimoAnterior
+        } else {
+            existente.pesoCorporal
+        }
+
+        // Creamos o actualizamos la estadística diaria con peso tomado
+        val actualizada = (existente ?: EstadisticasDiarias(
+            _id = null,
+            idFirebase = idFirebase,
+            fecha = fecha,
+            horasActivo = 0.0,
+            kCaloriasQuemadas = 0.0,
+            ejerciciosRealizados = 0,
+            pesoCorporal = pesoAnterior
+        )).copy(
+            horasActivo = patch.horasActivo?.let { (existente?.horasActivo ?: 0.0) + it } ?: (existente?.horasActivo ?: 0.0),
+            ejerciciosRealizados = patch.ejerciciosRealizados?.let { (existente?.ejerciciosRealizados ?: 0) + it } ?: (existente?.ejerciciosRealizados ?: 0),
+            kCaloriasQuemadas = patch.kCaloriasQuemadas?.let { (existente?.kCaloriasQuemadas ?: 0.0) + it } ?: (existente?.kCaloriasQuemadas ?: 0.0),
+            pesoCorporal = patch.pesoCorporal ?: pesoAnterior
         )
+
         val guardada = estadisticasDiariasRepository.save(actualizada)
 
         return ResponseEntity.ok(estadisticasDiariasToDto(guardada))
@@ -57,7 +65,8 @@ class EstadisticasDiariasService(
         // Rellenar con ceros al principio si hay menos de 5
         val resultado = List(5 - todas.size) { 0.0 } + pesos
 
-        return ResponseEntity.ok(resultado.asReversed())
+        //el punto reversed es necesario, nico del futuro no tocar esto
+        return ResponseEntity.ok(resultado.reversed())
     }
 
 }

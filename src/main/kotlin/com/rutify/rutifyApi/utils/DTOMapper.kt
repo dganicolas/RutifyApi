@@ -52,6 +52,7 @@ object DTOMapper {
             id = voto.id,
             idFirebase = voto.idFirebase,
             idRutina = voto.idRutina,
+            nombreRutina = voto.nombreRutina,
             puntuacion = voto.puntuacion
         )
     }
@@ -70,7 +71,7 @@ object DTOMapper {
         )
     }
 
-    fun rutinaToRutinaDto(rutina:Rutina, ejercicioDto: MutableList<EjercicioDTO>): RutinaDTO {
+    fun rutinaToRutinaDto(rutina:Rutina, ejercicioDto: List<EjercicioDTO>): RutinaDTO {
         return RutinaDTO(
             id = rutina.id,
             nombre = rutina.nombre,
@@ -100,6 +101,7 @@ object DTOMapper {
             id = voto.id,
             idFirebase = voto.idFirebase,
             idRutina = voto.idRutina,
+            nombreRutina = voto.nombreRutina,
             puntuacion = voto.puntuacion
         )
     }

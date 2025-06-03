@@ -14,7 +14,6 @@ import com.rutify.rutifyApi.utils.DTOMapper.ejercicioToEjercicioDto
 import com.rutify.rutifyApi.utils.DTOMapper.rutinaToRutinaBuscadorDto
 import com.rutify.rutifyApi.utils.DTOMapper.rutinaToRutinaDto
 import com.rutify.rutifyApi.utils.DTOMapper.rutinasDtoToRutina
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Sort
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.query.Criteria
@@ -105,7 +104,7 @@ class RutinaService(
 
     }
 
-    fun eliminarRutina(idRutina: String, authentication: Authentication): ResponseEntity<Void> {
+    fun eliminarRutina(idRutina: String, authentication: Authentication): ResponseEntity<Unit> {
 
         val usuario = usuarioRepository.findByIdFirebase(authentication.name) ?: throw NotFoundException("El usuario ${authentication.name} no existe ")
         val rutina = rutinaRepository.findById(idRutina).orElseThrow { NotFoundException("No se encontró la rutina con ID: $idRutina") }!!

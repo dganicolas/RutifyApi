@@ -46,7 +46,7 @@ class RutinaController {
     }
 
     @DeleteMapping("/eliminar/{idRutina}")
-    fun eliminarRutina(@PathVariable idRutina: String,authentication: Authentication): ResponseEntity<Void> {
+    fun eliminarRutina(@PathVariable idRutina: String,authentication: Authentication): ResponseEntity<Unit> {
         return rutinaService.eliminarRutina(idRutina,authentication)
     }
 }

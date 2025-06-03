@@ -1,21 +1,17 @@
 package com.rutify.rutifyApi.service
 
 import com.rutify.rutifyApi.domain.Estadisticas
-import com.rutify.rutifyApi.domain.EstadisticasDiarias
 import com.rutify.rutifyApi.dto.EstadisticasDto
 import com.rutify.rutifyApi.dto.EstadisticasPatchDto
 import com.rutify.rutifyApi.exception.exceptions.ConflictException
 import com.rutify.rutifyApi.exception.exceptions.NotFoundException
 import com.rutify.rutifyApi.exception.exceptions.UnauthorizedException
-import com.rutify.rutifyApi.repository.IEstadisticasDiariasRepository
 import com.rutify.rutifyApi.repository.IEstadisticasRepository
 import com.rutify.rutifyApi.utils.DTOMapper
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.Authentication
 import org.springframework.stereotype.Service
-import java.time.LocalDate
 
 @Service
 class EstadisticasService(

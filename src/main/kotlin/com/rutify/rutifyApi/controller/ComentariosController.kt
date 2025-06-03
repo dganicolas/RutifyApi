@@ -1,7 +1,7 @@
 package com.rutify.rutifyApi.controller
 
 import com.rutify.rutifyApi.dto.ComentarioDto
-import com.rutify.rutifyApi.iService.IComunidadService
+import com.rutify.rutifyApi.iService.IComentariosService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.Authentication
@@ -9,30 +9,30 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 
 @RestController
-@RequestMapping("/v1/comunidad")
-class ComunidadController {
+@RequestMapping("/v1/comentarios")
+class ComentariosController {
 
     @Autowired
-    private lateinit var comunidadService: IComunidadService
+    private lateinit var comentariosService: IComentariosService
 
     @PostMapping("/comentarios")
     fun crearComentario(
         @RequestPart("comentario") comentario: ComentarioDto,
         @RequestPart(value = "imagen", required = false) imagen: MultipartFile?,
     ): ResponseEntity<ComentarioDto> {
-        val nuevoComentario = comunidadService.crearComentario(comentario, imagen)
+        val nuevoComentario = comentariosService.crearComentario(comentario, imagen)
         return ResponseEntity.ok(nuevoComentario)
     }
 
     @GetMapping("/comentarios")
     fun obtenerComentarios(): ResponseEntity<List<ComentarioDto>> {
-        val comentarios = comunidadService.obtenerComentarios()
+        val comentarios = comentariosService.obtenerComentarios()
         return ResponseEntity.ok(comentarios)
     }
 
     @GetMapping("/comentarios/{id}/respuestas")
     fun obtenerRespuestas(@PathVariable id: String): ResponseEntity<List<ComentarioDto>> {
-        val respuestas = comunidadService.obtenerRespuestas(id)
+        val respuestas = comentariosService.obtenerRespuestas(id)
         return ResponseEntity.ok(respuestas)
     }
 
@@ -40,16 +40,16 @@ class ComunidadController {
     fun responderComentario(
         @RequestBody respuesta: ComentarioDto,
     ): ResponseEntity<ComentarioDto> {
-        val nuevaRespuesta = comunidadService.responderComentario(respuesta)
+        val nuevaRespuesta = comentariosService.responderComentario(respuesta)
         return ResponseEntity.ok(nuevaRespuesta)
     }
 
-    @DeleteMapping("/comentarios")
+    @DeleteMapping("/comentarios/{idComentario}")
     fun eliminarComentario(
-        @RequestBody comentario:ComentarioDto,
+        @PathVariable idComentario: String,
         authentication: Authentication
-    ): ResponseEntity<Void> {
-        comunidadService.eliminarComentario(comentario, authentication)
+    ): ResponseEntity<Unit> {
+        comentariosService.eliminarComentario(idComentario, authentication)
         return ResponseEntity.noContent().build()
     }
 
@@ -57,9 +57,19 @@ class ComunidadController {
     fun aprobarComentario(
         @RequestBody comentario: ComentarioDto,
         authentication: Authentication
-    ): ResponseEntity<Void> {
-        comunidadService.aprobarComentario(comentario, authentication)
+    ): ResponseEntity<Unit> {
+        comentariosService.aprobarComentario(comentario, authentication)
         return ResponseEntity.noContent().build()
+    }
+
+    @GetMapping("/autor/{creadorId}")
+    fun obtenerComentariosPorAutor(@PathVariable creadorId: String): ResponseEntity<List<ComentarioDto>> {
+        return comentariosService.obtenerComentariosPorAutor(creadorId)
+    }
+
+    @GetMapping("/autorComentario/{nombre}")
+    fun obtenerComentariosPorNombre(@PathVariable nombre: String): ResponseEntity<List<ComentarioDto>> {
+        return comentariosService.obtenerComentariosPorNombre(nombre)
     }
 
 }

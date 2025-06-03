@@ -30,7 +30,7 @@ class UsuariosController(private val db: Firestore) {
     fun eliminarCuenta(
         @RequestBody eliminarUsuarioDTO: EliminarUsuarioDTO,
         authentication: Authentication
-    ): ResponseEntity<Void> {
+    ): ResponseEntity<Unit> {
         return usuariosService.eliminarUsuarioPorCorreo(eliminarUsuarioDTO.correo, authentication)
     }
 
@@ -39,7 +39,7 @@ class UsuariosController(private val db: Firestore) {
         @PathVariable nombre: String,
         @PathVariable pagina: Int,
         @PathVariable tamano: Int
-    ): ResponseEntity<BusquedaUsuariosRespuesta> {
+    ): ResponseEntity<List<UsuarioBusquedaDto>> {
         return usuariosService.buscarUsuariosPorNombre(nombre, pagina, tamano)
     }
 
@@ -49,7 +49,7 @@ class UsuariosController(private val db: Firestore) {
     }
 
     @PutMapping("/actualizar")
-    fun actualizarCorreo(
+    fun actualizarCuenta(
         authentication: Authentication,
         @RequestBody actualizarUsuarioDTO: ActualizarUsuarioDTO
     ): ResponseEntity<ActualizarUsuarioDTO> {

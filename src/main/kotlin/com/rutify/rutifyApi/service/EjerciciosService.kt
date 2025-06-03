@@ -6,14 +6,12 @@ import com.rutify.rutifyApi.exception.exceptions.NotFoundException
 import com.rutify.rutifyApi.exception.exceptions.ValidationException
 import com.rutify.rutifyApi.repository.IEjercicioRepository
 import com.rutify.rutifyApi.utils.DTOMapper.ejercicioDtoToEjercicio
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import java.time.LocalDate
-import java.time.temporal.ChronoUnit
 import kotlin.random.Random
 
 @Service

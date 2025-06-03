@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.Authentication
 import org.springframework.stereotype.Service
+import kotlin.jvm.optionals.getOrNull
 
 @Service
 class VotosService {
@@ -25,10 +26,10 @@ class VotosService {
     private lateinit var usuarioRepository: IUsuarioRepository
 
     private fun validarVotos(voto: VotodDto){
+        val rutina = rutinaRepository.findById(voto.idRutina)
         if(usuarioRepository.findByIdFirebase(voto.idFirebase) == null) throw ValidationException("el usuario no existe")
-        if(rutinaRepository.findById(voto.idRutina).isEmpty) throw ValidationException("la rutina no existe")
-
-        if (voto.puntuacion <= 0.0 || voto.puntuacion >= 5.0) throw ValidationException("La puntuación debe ser mayor a 0.0 y menor a 5.0")
+        if(rutina.isEmpty) throw ValidationException("la rutina no existe")
+        if (voto.puntuacion <= 0.0 || voto.puntuacion > 5.0) throw ValidationException("La puntuación debe ser mayor a 0.0 y menor a 5.0")
 
     }
 
@@ -39,7 +40,8 @@ class VotosService {
         rutinaRepository.save(rutina)
     }
 
-    fun agregarVotacion(voto: VotodDto, authentication: Authentication): ResponseEntity<VotodDto> {
+    fun agregarVotacion(votoEntrante: VotodDto, authentication: Authentication): ResponseEntity<VotodDto> {
+        val voto = votoEntrante
         if (voto.idFirebase != authentication.name) {
             throw UnauthorizedException("No tienes permiso para crear este voto a otro usuario")
         }
@@ -47,6 +49,7 @@ class VotosService {
         if(votosRepository.findByIdFirebaseAndIdRutina(voto.idFirebase,voto.idRutina) != null){
             throw ConflictException("el voto ya existe")
         }
+        voto.nombreRutina = rutinaRepository.findById(voto.idRutina).get().nombre
         anotarVoto(voto.puntuacion,1,voto.idRutina)
         val votoGuardado = votosRepository.save(DTOMapper.votosDtoToVoto(voto))
         return ResponseEntity.status(HttpStatus.CREATED).body(DTOMapper.votoTovotosDto(votoGuardado))
@@ -64,10 +67,10 @@ class VotosService {
         return ResponseEntity.ok(voto)
     }
 
-    fun eliminarVoto(voto: VotodDto, authentication: Authentication): ResponseEntity<Void> {
-        val votoExistente = votosRepository.findByIdFirebaseAndIdRutina(voto.idFirebase, voto.idRutina)
+    fun eliminarVoto(idVoto: String, authentication: Authentication): ResponseEntity<Unit> {
+        val votoExistente = votosRepository.findById(idVoto).getOrNull()
             ?: throw ValidationException("el voto no existe")
-        if (voto.idFirebase != authentication.name) {
+        if (votoExistente.idFirebase != authentication.name) {
             throw UnauthorizedException("No tienes permiso para eliminar este voto")
         }
         anotarVoto(-votoExistente.puntuacion,-1,votoExistente.idRutina)
@@ -83,6 +86,14 @@ class VotosService {
             ?: throw ValidationException("el voto no existe")
 
         return ResponseEntity.ok(DTOMapper.votoTovotosDto(votoExistente))
+    }
+
+    fun obtenerComentariosPorAutor(creadorId: String): ResponseEntity<List<VotodDto>> {
+        if (creadorId.isBlank()) {
+            throw ValidationException("El ID del creador no puede estar vacío")
+        }
+        val votos = votosRepository.findAllByIdFirebase(creadorId)
+        return ResponseEntity.ok(votos.map { DTOMapper.votoTovotosDto(it) })
     }
 
 

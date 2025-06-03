@@ -1,6 +1,5 @@
 package com.rutify.rutifyApi.service
 
-import com.cloudinary.Cloudinary
 import com.rutify.rutifyApi.dto.ComentarioDto
 import com.rutify.rutifyApi.exception.exceptions.UnauthorizedException
 import com.rutify.rutifyApi.repository.ComentarioRepository
@@ -12,7 +11,7 @@ import org.springframework.stereotype.Service
 class ModeracionService(
     private val comentarioRepository: ComentarioRepository,
     private val usuariosService: UsuariosService,
-    private val comunidadService: ComunidadService,
+    private val comunidadService: ComentarioService,
     private val notificacionService: NotificacionService,
     private val mensajesService: MensajesService,
 ) {
@@ -25,11 +24,11 @@ class ModeracionService(
         }
     }
 
-    fun eliminarComentario(comentario: ComentarioDto, authentication: Authentication) {
-
+    fun eliminarComentario(id: String, authentication: Authentication) {
+        val comentario = comunidadService.obtenerComentarioPorId(id)
         if (!usuariosService.EsAdmin(authentication.name).body!!) throw UnauthorizedException("No tienes permiso")
 
-        comunidadService.eliminarComentario(comentario, authentication)
+        comunidadService.eliminarComentario(comentario._id!!, authentication)
         notificacionService.incumplimiento(
             comentario.idFirebase,
             mensajesService.obtenerMensaje("notificacion.titulo"),

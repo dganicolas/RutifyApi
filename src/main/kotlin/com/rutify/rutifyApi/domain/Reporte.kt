@@ -4,16 +4,12 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.Field
 
-@Document(collection = "votos")
-data class Voto(
+@Document(collection = "Reportes")
+class Reporte (
     @Id
     val id: String? = null,
     @Field
-    val idFirebase: String,
+    val reportadorIdFirebase:String,
     @Field
-    val idRutina: String,
-    @Field
-    val nombreRutina: String,
-    @Field
-    var puntuacion: Float
+    val reportadoIdFirebase:String
 )

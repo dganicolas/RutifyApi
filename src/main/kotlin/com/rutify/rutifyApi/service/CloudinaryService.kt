@@ -1,4 +1,4 @@
-package com.rutify.rutifyApi.controller
+package com.rutify.rutifyApi.service
 
 import com.cloudinary.Cloudinary
 import com.cloudinary.utils.ObjectUtils
@@ -14,7 +14,7 @@ class CloudinaryService() {
 
     fun subirImagen(file: MultipartFile): String {
         val fileBytes = file.bytes
-        val uploadResult = cloudinary.uploader().upload(fileBytes, ObjectUtils.emptyMap())
+        val uploadResult = cloudinary.uploader().upload(fileBytes, ObjectUtils.emptyMap()).toMap()
         val publicId = uploadResult["public_id"] as String
         val version = uploadResult["version"].toString()
         val format = uploadResult["format"] as String  // ej: "jpg"
