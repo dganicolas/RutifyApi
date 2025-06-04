@@ -1,18 +1,24 @@
 package com.rutify.rutifyApi.service
 
+import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.rutify.rutifyApi.dto.PaymentRequestDto
 import com.rutify.rutifyApi.dto.PaymentResponse
 import com.rutify.rutifyApi.exception.exceptions.ValidationException
 import com.stripe.exception.SignatureVerificationException
+import com.stripe.model.Event
 import com.stripe.model.PaymentIntent
 import com.stripe.net.Webhook
 import com.stripe.param.PaymentIntentCreateParams
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 
+
 @Service
 class StripeService(
-    private val usuariosService: UsuariosService
+    private val usuariosService: UsuariosService,
 ) {
         fun crearPago(request: PaymentRequestDto): PaymentResponse {
             val eurPerCoin = 0.01 // 1 moneda = 0.01€
@@ -39,28 +45,35 @@ class StripeService(
         }
 
     fun handleWebhook(payload: String, sigHeader: String, endpointSecret: String): ResponseEntity<String> {
-        try {
-            val event = Webhook.constructEvent(
-                payload,
-                sigHeader,
-                endpointSecret
-            )
+        return try {
+            // Verifica la firma del evento
+            val event = Webhook.constructEvent(payload, sigHeader, endpointSecret)
 
-            if (event.type == "payment_intent.succeeded") {
-                val intent = event.dataObjectDeserializer.`object`.get() as PaymentIntent
+            // Parseo manual del payload con Jackson
+            val mapper = jacksonObjectMapper()
+            mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 
-                val userId = intent.metadata["userId"] ?: return ResponseEntity.badRequest().body("No userId in metadata")
-                val coins = intent.metadata["coins"] ?: return ResponseEntity.badRequest().body("No userId in metadata")
-                usuariosService.anadirMonedas(userId,coins.toInt())
+            val rootNode = mapper.readTree(payload)
+            val metadata = rootNode
+                ?.get("data")
+                ?.get("object")
+                ?.get("metadata")
 
-                println("✅ Pago exitoso. Se añadieron $coins monedas al usuario $userId.")
+            if (metadata == null || !metadata.has("userId") || !metadata.has("coins")) {
+                return ResponseEntity.badRequest().body("❌ Metadata faltante o incompleta")
             }
 
-            return ResponseEntity.ok("Evento recibido")
+            val userId = metadata["userId"].asText()
+            val coins = metadata["coins"].asInt()
+
+            println("✅ Recibido: $coins monedas para el usuario $userId")
+            usuariosService.anadirMonedas(userId, coins)
+
+            ResponseEntity.ok("")
         } catch (e: SignatureVerificationException) {
-            throw ValidationException("Firma inválida")
+            ResponseEntity.status(400).body("Firma inválida")
         } catch (e: Exception) {
-            return ResponseEntity.status(500).body("Error al procesar el evento")
+            ResponseEntity.status(500).body("Error al procesar el webhook: ${e.message}")
         }
     }
 

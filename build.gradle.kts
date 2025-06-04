@@ -61,7 +61,7 @@ dependencies {
 	testImplementation("org.mockito.kotlin:mockito-kotlin:5.1.0")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
-	implementation("com.stripe:stripe-java:24.0.0")
+	implementation("com.stripe:stripe-java:23.0.0")
 
 
 }

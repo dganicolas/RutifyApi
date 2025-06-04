@@ -2,6 +2,7 @@ package com.rutify.rutifyApi.utils
 
 import com.rutify.rutifyApi.domain.*
 import com.rutify.rutifyApi.dto.*
+import java.time.LocalDate
 
 object DTOMapper {
 
@@ -118,8 +119,30 @@ object DTOMapper {
         )
     }
 
-    fun listaEstadisticasDiariasToDto(lista: List<EstadisticasDiarias>): List<EstadisticasDiariasDto> {
-        return lista.map { estadisticasDiariasToDto(it) }
+    fun usuarioToUsuarioInformacionDto(
+        usuario: Usuario,
+        estadisticas: Estadisticas?,
+        countRutinas: Long,
+        countComentarios: Long,
+        countVotos: Long
+    ): UsuarioInformacionDto{
+        return UsuarioInformacionDto(
+            idFirebase = usuario.idFirebase,
+            nombre = usuario.nombre,
+            correo = usuario.correo,
+            sexo = usuario.sexo,
+            esPremium = usuario.esPremium,
+            avatarUrl = usuario.avatar,
+            estadisticas = DTOMapper.estadisticasToEstadisticasDto(
+                estadisticas ?: Estadisticas(null, "", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, 0.0)
+            ),
+            countRutinas = countRutinas,
+            fechaUltimoReto = usuario.fechaUltimoReto,
+            countComentarios = countComentarios,
+            countVotos = countVotos,
+            monedas = usuario.monedas,
+            indumentaria = usuario.indumentaria
+        )
     }
 
     fun ComentarioToComentarioDto(comentario: Comentario): ComentarioDto{
@@ -148,5 +171,18 @@ object DTOMapper {
             texto = comentario.texto,
             idComentarioPadre = comentario.idComentarioPadre
         )
+    }
+
+    fun usuarioRegistroDtoToUsuario(usuario: UsuarioRegistroDTO, uid: String): Usuario {
+        return Usuario(
+            idFirebase = uid,
+            nombre = usuario.nombre,
+            fechaNacimiento = usuario.fechaNacimiento,
+            sexo = usuario.sexo,
+            correo = usuario.correo,
+            gimnasioId = null,
+            esPremium = false,
+            rol = "user",
+            fechaUltimoReto = LocalDate.now().minusDays(-1))
     }
 }

@@ -33,5 +33,12 @@ data class Usuario(
     @Field
     var rol:String,
     @Field
-    var monedas:Int = 0
+    var monedas:Int = 0,
+    @Field
+    var indumentaria: Indumentaria = Indumentaria(
+        colorPiel = "https://i.ibb.co/mkfD3hj/brazos-1.webp",
+        camiseta = "https://i.ibb.co/ccLWvVh3/camisetaavatar-2.webp",
+        pantalon = "https://i.postimg.cc/pdyyJWQ0/pantalonavatar.webp",
+        tenis = "https://i.ibb.co/Y7KVHNKC/zapatoavatar.webp"
+    )
 )

@@ -1,5 +1,6 @@
 package com.rutify.rutifyApi.dto
 
+import com.rutify.rutifyApi.domain.Indumentaria
 import java.time.LocalDate
 
 data class UsuarioInformacionDto(
@@ -13,5 +14,7 @@ data class UsuarioInformacionDto(
     val estadisticas: EstadisticasDto,
     val countRutinas: Long,
     val countComentarios: Long,
-    val countVotos: Long
+    val countVotos: Long,
+    var monedas:Int = 0,
+    var indumentaria: Indumentaria
 )

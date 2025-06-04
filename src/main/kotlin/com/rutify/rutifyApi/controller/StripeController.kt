@@ -33,9 +33,4 @@ class StripeController(
     fun handleStripeWebhook(@RequestBody payload: String, @RequestHeader("Stripe-Signature") sigHeader: String): ResponseEntity<String> {
         return stripeService.handleWebhook(payload,sigHeader,endpointSecret)
     }
-
-
-    private fun calculateOrderAmount(items: List<PaymentItem>): Int {
-        return items.sumOf { it.amount.toInt() }
-    }
 }
