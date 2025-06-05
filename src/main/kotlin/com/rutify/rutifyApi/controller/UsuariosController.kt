@@ -1,6 +1,7 @@
 package com.rutify.rutifyApi.controller
 
 import com.google.cloud.firestore.Firestore
+import com.rutify.rutifyApi.domain.Cosmetico
 import com.rutify.rutifyApi.dto.*
 import com.rutify.rutifyApi.service.UsuariosService
 import org.springframework.beans.factory.annotation.Autowired
@@ -64,5 +65,13 @@ class UsuariosController(private val db: Firestore) {
     @PostMapping("/reto-diario")
     fun retoDiario(authentication: Authentication): ResponseEntity<Boolean> {
         return usuariosService.marcarRetoDiario(authentication)
+    }
+
+    @PutMapping("/avatar/cosmetico")
+    fun aplicarCosmetico(
+        authentication: Authentication,
+        @RequestBody dto: Cosmetico
+    ): ResponseEntity<Unit> {
+        return usuariosService.aplicarCosmetico(authentication, dto)
     }
 }

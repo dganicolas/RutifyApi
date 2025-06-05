@@ -33,6 +33,9 @@ class CompraService(
     }
 
     fun registrarCompra(compra: Compra): ResponseEntity<String> {
+        if (idsDefecto.contains(compra.idCosmetico)) {
+            throw ConflictException("Este cosmético ya lo tienes por defecto")
+        }
         val yaComprado = compraRepository.findByIdUsuarioAndIdCosmetico(
             compra.idUsuario,
             compra.idCosmetico

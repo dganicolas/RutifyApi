@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.auth.UserRecord
+import com.rutify.rutifyApi.domain.Cosmetico
 import com.rutify.rutifyApi.domain.FirebaseLoginResponse
 import com.rutify.rutifyApi.dto.*
 import com.rutify.rutifyApi.exception.exceptions.FirebaseUnavailableException
@@ -37,7 +38,7 @@ class UsuariosService(
     val votosRepository: IVotosRepository,
     private val mensajesService: MensajesService,
     @Value("\${firebase.apikey}") val apiKey: String,
-    val firebaseAuth: FirebaseAuth
+    val firebaseAuth: FirebaseAuth,
 ) : ServiceBase(usuarioRepository) {
 
     fun registrarUsuario(usuario: UsuarioRegistroDTO): ResponseEntity<UsuarioregistradoDto> {
@@ -47,7 +48,7 @@ class UsuariosService(
                 .setEmail(usuario.correo)
                 .setPassword(usuario.contrasena)
             val userRecord = firebaseAuth.createUser(request)
-            val nuevoUsuario = usuarioRegistroDtoToUsuario(usuario,userRecord.uid)
+            val nuevoUsuario = usuarioRegistroDtoToUsuario(usuario, userRecord.uid)
 
             usuarioRepository.save(nuevoUsuario)
             ResponseEntity(DTOMapper.usuarioRegisterDTOToUsuarioProfileDto(nuevoUsuario), HttpStatus.OK)
@@ -57,7 +58,7 @@ class UsuariosService(
         }
     }
 
-    fun validarUsuarioRegistro(usuario: UsuarioRegistroDTO){
+    fun validarUsuarioRegistro(usuario: UsuarioRegistroDTO) {
 
         if (usuario.nombre.isBlank()) {
             throw ValidationException("El nombre no puede estar vacío")
@@ -264,12 +265,28 @@ class UsuariosService(
         }
     }
 
-    fun quitarMonedas(idFirebase: String, precioMonedas: Int){
+    fun quitarMonedas(idFirebase: String, precioMonedas: Int) {
         val usuario = obtenerUsuario(idFirebase)
 
-        if(usuario.monedas < precioMonedas) throw ValidationException("no hay monedas suficientes")
+        if (usuario.monedas < precioMonedas) throw ValidationException("no hay monedas suficientes")
         usuario.monedas -= precioMonedas
         usuarioRepository.save(usuario)
+    }
+
+    fun aplicarCosmetico(authentication: Authentication, dto: Cosmetico): ResponseEntity<Unit> {
+        val usuario = usuarioRepository.findByIdFirebase(authentication.name)
+            ?: throw NotFoundException("Usuario no encontrado")
+
+        when (dto.tipo) {
+            "piel" -> usuario.indumentaria.colorPiel = dto.imagenUrl
+            "camiseta" -> usuario.indumentaria.camiseta = dto.imagenUrl
+            "pantalon" -> usuario.indumentaria.pantalon = dto.imagenUrl
+            "tenis" -> usuario.indumentaria.tenis = dto.imagenUrl
+            else -> throw ValidationException("Tipo de cosmético desconocido: ${dto.tipo}")
+        }
+
+        usuarioRepository.save(usuario)
+        return ResponseEntity.ok().build()
     }
 
 

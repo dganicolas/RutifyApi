@@ -1,8 +1,8 @@
 package com.rutify.rutifyApi.domain
 
 data class Indumentaria(
-    val colorPiel: String,
-    val camiseta: String,
-    val pantalon: String,
-    val tenis: String
+    var colorPiel: String,
+    var camiseta: String,
+    var pantalon: String,
+    var tenis: String
 )

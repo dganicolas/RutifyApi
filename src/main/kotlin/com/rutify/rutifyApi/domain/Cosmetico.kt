@@ -5,7 +5,7 @@ import org.springframework.data.mongodb.core.mapping.Document
 
 @Document(collection = "cosmeticos")
 data class Cosmetico(
-    @Id val id: String? = null,
+    @Id val _id: String? = null,
     val nombre: String,
     val tipo: String,
     val precioMonedas: Int,
