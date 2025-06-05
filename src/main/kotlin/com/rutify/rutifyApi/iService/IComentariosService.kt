@@ -16,5 +16,7 @@ interface IComentariosService {
     fun obtenerComentarioPorId(id:String): Comentario
     fun obtenerComentariosPorAutor(idFirebase:String): ResponseEntity<List<ComentarioDto>>
     fun obtenerComentariosPorNombre(nombre: String): ResponseEntity<List<ComentarioDto>>
+    fun countByIdFirebaseAndIdComentarioPadreIsNull(idFirebase: String): Long
+    fun eliminarComentariosDeUnUsuario(idFirebase: String, authentication: Authentication)
 
 }

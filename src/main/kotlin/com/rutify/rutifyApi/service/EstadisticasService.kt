@@ -64,4 +64,10 @@ class EstadisticasService(
     fun eliminarEstadisticasPorUsuarioId(usuarioId: String, authentication: Authentication): ResponseEntity<EstadisticasDto> {
         TODO("Not yet implemented")
     }
+
+    fun findByIdFirebase(idFirebase: String): Estadisticas? {
+        return estadisticasRepository.findByIdFirebase(
+            idFirebase
+        )
+    }
 }

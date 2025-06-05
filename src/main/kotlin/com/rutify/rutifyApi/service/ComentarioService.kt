@@ -130,4 +130,15 @@ class ComentarioService(
         val comentarios = comentarioRepository.findAllByNombreUsuarioContainingIgnoreCase(nombre)
         return ResponseEntity.ok(comentarios.map { DTOMapper.ComentarioToComentarioDto(it) })
     }
+
+    override fun countByIdFirebaseAndIdComentarioPadreIsNull(idFirebase: String): Long {
+        return comentarioRepository.countByIdFirebaseAndIdComentarioPadreIsNull(idFirebase)
+    }
+
+    override fun eliminarComentariosDeUnUsuario(idFirebase: String, authentication: Authentication) {
+        val comentarios = comentarioRepository.findAllByIdFirebaseAndIdComentarioPadreIsNull(idFirebase)
+        comentarios.forEach{
+            eliminarComentario(it._id!!,authentication)
+        }
+    }
 }

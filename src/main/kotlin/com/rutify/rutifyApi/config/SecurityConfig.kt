@@ -21,8 +21,9 @@ class SecurityConfig{
                 authz
                     .requestMatchers("/v1/usuarios/registrarse").permitAll()  // URL pública
                     .requestMatchers("/v1/usuarios/acceder").permitAll()
-                    //.anyRequest().authenticated() // Aseguramos que todas las solicitudes requieran autenticación
-                    .anyRequest().permitAll()
+                    .requestMatchers("/v1/pagos/stripe-webhook").permitAll()
+                    .requestMatchers("/terminos-y-condiciones.html").permitAll()
+                    .anyRequest().authenticated()
             }
             .oauth2ResourceServer { it.jwt { } }
             .build()

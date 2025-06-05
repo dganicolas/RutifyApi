@@ -31,11 +31,13 @@ import java.time.Period
 @Service
 class UsuariosService(
     usuarioRepository: IUsuarioRepository,
-    val estadisticasRepository: IEstadisticasRepository,
+    val estadisticasService: EstadisticasService,
     val emailService: EmailService,
     val rutinaRepository: IRutinasRepository,
-    val comentarioRepository: ComentarioRepository,
-    val votosRepository: IVotosRepository,
+    val comentarioService: ComentarioService,
+    val votosService: VotosService,
+    val estadisticasDiariasService: EstadisticasDiariasService,
+    val compraRepository: CompraRepository,
     private val mensajesService: MensajesService,
     @Value("\${firebase.apikey}") val apiKey: String,
     val firebaseAuth: FirebaseAuth,
@@ -119,9 +121,8 @@ class UsuariosService(
     }
 
     fun eliminarUsuarioPorCorreo(correo: String, authentication: Authentication): ResponseEntity<Unit> {
-        val uidActual = authentication.name // UID desde el JWT
+        val uidActual = authentication.name
 
-        // Buscar en Firebase Firestore por correo
         val usuario = usuarioRepository.findByCorreo(correo)
             ?: throw NotFoundException("Usuario con correo $correo no encontrado.")
 
@@ -129,6 +130,9 @@ class UsuariosService(
 
         eliminarDeFirestore(usuario.idFirebase)
         eliminarDeMongoDb(correo)
+        votosService.eliminarVotosDeUnsuario(usuario.idFirebase,authentication)
+        comentarioService.eliminarComentariosDeUnUsuario(usuario.idFirebase,authentication)
+        compraRepository.deleteByIdUsuario(usuario.idFirebase)
         emailService.enviarCorreoNotificacion(
             usuario.correo,
             "Cuenta eliminada de rutify",
@@ -160,12 +164,12 @@ class UsuariosService(
         if (usuario.perfilPublico || usuario.idFirebase == authentication.name) {
             return ResponseEntity.ok(
                 usuarioToUsuarioInformacionDto(
-                    usuario, estadisticasRepository.findByIdFirebase(
+                    usuario, estadisticasService.findByIdFirebase(
                         idFirebase
                     ),
                     rutinaRepository.countByCreadorId(idFirebase),
-                    comentarioRepository.countByIdFirebaseAndIdComentarioPadreIsNull(idFirebase),
-                    votosRepository.countByIdFirebase(idFirebase)
+                    comentarioService.countByIdFirebaseAndIdComentarioPadreIsNull(idFirebase),
+                    votosService.countByIdFirebase(idFirebase)
                 )
 
             )

@@ -88,12 +88,23 @@ class VotosService {
         return ResponseEntity.ok(DTOMapper.votoTovotosDto(votoExistente))
     }
 
-    fun obtenerComentariosPorAutor(creadorId: String): ResponseEntity<List<VotodDto>> {
+    fun obtenerVotosPorAutor(creadorId: String): ResponseEntity<List<VotodDto>> {
         if (creadorId.isBlank()) {
             throw ValidationException("El ID del creador no puede estar vacío")
         }
         val votos = votosRepository.findAllByIdFirebase(creadorId)
         return ResponseEntity.ok(votos.map { DTOMapper.votoTovotosDto(it) })
+    }
+
+    fun eliminarVotosDeUnsuario(idFirebase: String, authentication: Authentication) {
+        val votos = votosRepository.findAllByIdFirebase(idFirebase)
+        votos.forEach {
+            eliminarVoto(it.id!!, authentication)
+        }
+    }
+
+    fun countByIdFirebase(idFirebase: String): Long {
+        return votosRepository.countByIdFirebase(idFirebase)
     }
 
 

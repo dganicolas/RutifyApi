@@ -37,6 +37,6 @@ class VotosController {
 
     @GetMapping("/autor/{creadorId}")
     fun obtenerVotosPorAutor(@PathVariable creadorId: String): ResponseEntity<List<VotodDto>> {
-        return votosService.obtenerComentariosPorAutor(creadorId)
+        return votosService.obtenerVotosPorAutor(creadorId)
     }
 }
