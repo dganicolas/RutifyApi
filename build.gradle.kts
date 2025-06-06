@@ -1,3 +1,5 @@
+import org.springframework.boot.gradle.tasks.bundling.BootWar
+
 plugins {
 	kotlin("jvm") version "1.9.25"
 	kotlin("plugin.spring") version "1.9.25"
@@ -26,12 +28,12 @@ repositories {
 	}
 }
 
-tasks.withType<org.springframework.boot.gradle.tasks.bundling.BootWar> {
+tasks.withType<BootWar> {
 	archiveFileName.set("rutify.war")
 	mainClass.set("com.rutify.rutifyApi.RutifyApiApplicationKt")
 	manifest {
 		attributes(
-			"Main-Class" to "com.rutify.rutifyApi.RutifyApiApplicationKt"
+			"Main-Class" to "com.rutify.rutifyApi.RutifyApiApplication"
 		)
 	}
 }
