@@ -56,7 +56,7 @@ class StripeService(
                 ?.get("metadata")
 
             if (metadata == null || !metadata.has("userId") || !metadata.has("coins")) {
-                return ResponseEntity.badRequest().body("❌ Metadata faltante o incompleta")
+                return ResponseEntity.badRequest().body("Metadata faltante o incompleta")
             }
 
             val userId = metadata["userId"].asText()
