@@ -45,13 +45,13 @@ class RutinaService(
         return ResponseEntity.status(HttpStatus.CREATED).body(dto)
     }
 
-    private fun obtenerIdDeEjercicio(id: String, nombreEjercicio: String): String {
+    fun obtenerIdDeEjercicio(id: String, nombreEjercicio: String): String {
         return ejercicioRepository.findById(id)
             .orElseThrow { throw NotFoundException("El ejercicio $nombreEjercicio no existe") }.id
             ?: throw ValidationException("El ejercicio no tiene ID")
     }
 
-    private fun validarRutina(dto: RutinaDTO) {
+    fun validarRutina(dto: RutinaDTO) {
         if (dto.nombre.isBlank()) throw ValidationException("El nombre no puede estar vacío")
         if (dto.descripcion.isBlank()) throw ValidationException("La descripción no puede estar vacía")
         if (dto.ejercicios.isEmpty()) throw ValidationException("La rutina debe tener al menos un ejercicio")
@@ -65,7 +65,7 @@ class RutinaService(
         return ResponseEntity.ok(rutinas.map { rutinaToRutinaBuscadorDto(it) })
     }
 
-    private fun crearQueryPersonalizada(equipo: String?, page: Int, size: Int): Query {
+    fun crearQueryPersonalizada(equipo: String?, page: Int, size: Int): Query {
         val query = Query()
 
         equipo?.takeIf { it.isNotBlank() }?.let {

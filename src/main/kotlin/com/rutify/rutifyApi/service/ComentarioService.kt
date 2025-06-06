@@ -73,6 +73,7 @@ class ComentarioService(
             )
         )
     }
+
     fun extraerPublicId(imagenUrl: String?): String? {
         if (imagenUrl == null) return null
         val afterUpload = imagenUrl.substringAfter("/upload/").substringAfter("/")

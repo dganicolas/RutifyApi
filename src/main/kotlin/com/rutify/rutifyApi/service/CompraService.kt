@@ -16,14 +16,15 @@ import java.time.LocalDateTime
 class CompraService(
     private val compraRepository: CompraRepository,
     private val cosmeticoRepository: CosmeticoRepository,
-    private val usuarioService: UsuariosService
-) {
-    private val idsDefecto = listOf(
+    private val usuarioService: UsuariosService,
+    var idsDefecto: List<String> = listOf(
         "684083a658387bec10e36087",
         "6840839e58387bec10e36086",
         "6840838c58387bec10e36085",
         "684078ca58387bec10e36083"
     )
+) {
+
 
     fun obtenerCosmeticosDelUsuario(idUsuario: String): List<Cosmetico> {
         val compras = compraRepository.findByIdUsuario(idUsuario)

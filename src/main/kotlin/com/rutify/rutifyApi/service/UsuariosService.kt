@@ -41,7 +41,7 @@ class UsuariosService(
     val compraRepository: CompraRepository,
     val reporteService: ReporteService,
     val rutinaService: RutinaService,
-    private val mensajesService: MensajesService,
+    val mensajesService: MensajesService,
     @Value("\${firebase.apikey}") val apiKey: String,
     val firebaseAuth: FirebaseAuth,
 ) : ServiceBase(usuarioRepository) {
@@ -253,7 +253,7 @@ class UsuariosService(
         return ResponseEntity.ok(actualizarUsuarioDTO)
     }
 
-    private fun validarActualizarUsuarioDTO(actualizarUsuarioDTO: ActualizarUsuarioDTO) {
+    fun validarActualizarUsuarioDTO(actualizarUsuarioDTO: ActualizarUsuarioDTO) {
         actualizarUsuarioDTO.nombre?.let {
             if (it.isBlank()) throw ValidationException("El nombre no puede estar vacío")
         }

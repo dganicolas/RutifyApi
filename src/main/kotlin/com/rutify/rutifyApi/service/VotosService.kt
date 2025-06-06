@@ -16,24 +16,22 @@ import org.springframework.stereotype.Service
 import kotlin.jvm.optionals.getOrNull
 
 @Service
-class VotosService {
+class VotosService(
+    var rutinaRepository: IRutinasRepository,
+    var votosRepository: IVotosRepository,
+    var usuarioRepository: IUsuarioRepository,
+) {
 
-    @Autowired
-    private lateinit var rutinaRepository: IRutinasRepository
-    @Autowired
-    private lateinit var votosRepository: IVotosRepository
-    @Autowired
-    private lateinit var usuarioRepository: IUsuarioRepository
 
-    private fun validarVotos(voto: VotodDto){
+    fun validarVotos(voto: VotodDto) {
         val rutina = rutinaRepository.findById(voto.idRutina)
-        if(usuarioRepository.findByIdFirebase(voto.idFirebase) == null) throw ValidationException("el usuario no existe")
-        if(rutina.isEmpty) throw ValidationException("la rutina no existe")
+        if (usuarioRepository.findByIdFirebase(voto.idFirebase) == null) throw ValidationException("el usuario no existe")
+        if (rutina.isEmpty) throw ValidationException("la rutina no existe")
         if (voto.puntuacion <= 0.0 || voto.puntuacion > 5.0) throw ValidationException("La puntuación debe ser mayor a 0.0 y menor a 5.0")
 
     }
 
-    private fun anotarVoto(puntuacion:Float,votante:Int,idRutina:String){
+    private fun anotarVoto(puntuacion: Float, votante: Int, idRutina: String) {
         val rutina = rutinaRepository.findById(idRutina).get()
         rutina.totalVotos += votante
         rutina.votos += puntuacion
@@ -46,11 +44,11 @@ class VotosService {
             throw UnauthorizedException("No tienes permiso para crear este voto a otro usuario")
         }
         validarVotos(voto)
-        if(votosRepository.findByIdFirebaseAndIdRutina(voto.idFirebase,voto.idRutina) != null){
+        if (votosRepository.findByIdFirebaseAndIdRutina(voto.idFirebase, voto.idRutina) != null) {
             throw ConflictException("el voto ya existe")
         }
         voto.nombreRutina = rutinaRepository.findById(voto.idRutina).get().nombre
-        anotarVoto(voto.puntuacion,1,voto.idRutina)
+        anotarVoto(voto.puntuacion, 1, voto.idRutina)
         val votoGuardado = votosRepository.save(DTOMapper.votosDtoToVoto(voto))
         return ResponseEntity.status(HttpStatus.CREATED).body(DTOMapper.votoTovotosDto(votoGuardado))
     }
@@ -63,7 +61,7 @@ class VotosService {
         val votoExistente = votosRepository.findById(voto.id!!).get()
         val diferencia = voto.puntuacion - votoExistente.puntuacion
         votosRepository.save(DTOMapper.votosDtoToVoto(voto))
-        anotarVoto(diferencia,0,voto.idRutina)
+        anotarVoto(diferencia, 0, voto.idRutina)
         return ResponseEntity.ok(voto)
     }
 
@@ -73,7 +71,7 @@ class VotosService {
         if (votoExistente.idFirebase != authentication.name) {
             throw UnauthorizedException("No tienes permiso para eliminar este voto")
         }
-        anotarVoto(-votoExistente.puntuacion,-1,votoExistente.idRutina)
+        anotarVoto(-votoExistente.puntuacion, -1, votoExistente.idRutina)
         votosRepository.delete(votoExistente)
         return ResponseEntity.noContent().build()
     }

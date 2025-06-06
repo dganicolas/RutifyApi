@@ -7,10 +7,7 @@ import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 
 @Service
-class CloudinaryService() {
-
-    @Autowired
-    private lateinit var cloudinary: Cloudinary
+class CloudinaryService(private var cloudinary: Cloudinary) {
 
     fun subirImagen(file: MultipartFile): String {
         val fileBytes = file.bytes
