@@ -14,4 +14,6 @@ interface IUsuarioRepository : MongoRepository<Usuario, String> {
     @Query("{ 'nombre': { \$regex: ?0, \$options: 'i' }, 'perfilPublico': true }")
     fun findByNombreContainsAndPerfilPublicoTrue(nombre: String, pageable: Pageable): Page<Usuario>
 
+    fun findByReportesGreaterThanOrderByReportesAsc(minReportes: Int = 0): List<Usuario>
+
 }

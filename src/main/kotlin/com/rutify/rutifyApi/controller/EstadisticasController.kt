@@ -37,20 +37,4 @@ class EstadisticasController {
         return estadisticasService.actualizarEstadisticas(usuarioId, estadisticasActualizadas, authentication)
     }
 
-    @PutMapping("/reiniciar/{usuarioId}")
-    fun reiniciarEstadisticas(
-        @PathVariable usuarioId: String,
-        authentication: Authentication,
-    ): ResponseEntity<EstadisticasDto> {
-        return estadisticasService.reiniciarEstadisticas(usuarioId, authentication)
-    }
-
-    @DeleteMapping("/{usuarioId}")
-    fun eliminarEstadisticas(
-        @PathVariable usuarioId: String,
-        authentication: Authentication,
-    ): ResponseEntity<EstadisticasDto> {
-        return estadisticasService.eliminarEstadisticasPorUsuarioId(usuarioId, authentication)
-    }
-
 }

@@ -6,6 +6,7 @@ import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.auth.UserRecord
 import com.rutify.rutifyApi.domain.Cosmetico
 import com.rutify.rutifyApi.domain.FirebaseLoginResponse
+import com.rutify.rutifyApi.domain.Usuario
 import com.rutify.rutifyApi.dto.*
 import com.rutify.rutifyApi.exception.exceptions.FirebaseUnavailableException
 import com.rutify.rutifyApi.exception.exceptions.NotFoundException
@@ -38,6 +39,8 @@ class UsuariosService(
     val votosService: VotosService,
     val estadisticasDiariasService: EstadisticasDiariasService,
     val compraRepository: CompraRepository,
+    val reporteService: ReporteService,
+    val rutinaService: RutinaService,
     private val mensajesService: MensajesService,
     @Value("\${firebase.apikey}") val apiKey: String,
     val firebaseAuth: FirebaseAuth,
@@ -53,6 +56,11 @@ class UsuariosService(
             val nuevoUsuario = usuarioRegistroDtoToUsuario(usuario, userRecord.uid)
 
             usuarioRepository.save(nuevoUsuario)
+                emailService.enviarCorreoNotificacion(
+                    usuario.correo,
+                    "Cuenta creada en rutify",
+                    "su cuenta a sido creada el dia ${LocalDate.now()}, Bienvenido a nuestra plataforma y mejora cada dia con nosotros"
+                )
             ResponseEntity(DTOMapper.usuarioRegisterDTOToUsuarioProfileDto(nuevoUsuario), HttpStatus.OK)
         } catch (e: FirebaseAuthException) {
             e.printStackTrace()
@@ -120,7 +128,7 @@ class UsuariosService(
         }
     }
 
-    fun eliminarUsuarioPorCorreo(correo: String, authentication: Authentication): ResponseEntity<Unit> {
+    fun eliminarUsuarioPorCorreo(correo: String, authentication: Authentication,estado: Boolean = true): ResponseEntity<Unit> {
         val uidActual = authentication.name
 
         val usuario = usuarioRepository.findByCorreo(correo)
@@ -128,16 +136,30 @@ class UsuariosService(
 
         AuthUtils.verificarPermisos(usuario, uidActual)
 
-        eliminarDeFirestore(usuario.idFirebase)
-        eliminarDeMongoDb(correo)
+
         votosService.eliminarVotosDeUnsuario(usuario.idFirebase,authentication)
         comentarioService.eliminarComentariosDeUnUsuario(usuario.idFirebase,authentication)
         compraRepository.deleteByIdUsuario(usuario.idFirebase)
-        emailService.enviarCorreoNotificacion(
-            usuario.correo,
-            "Cuenta eliminada de rutify",
-            "su cuenta a sido eliminada el dia ${LocalDate.now()}, lamentamos que te hayas despedido de nosotro"
-        )
+        estadisticasService.deleteByIdUsuario(usuario.idFirebase,authentication)
+        estadisticasDiariasService.eliminarEstadisticas(usuario.idFirebase,obtenerUsuario(authentication.name))
+        reporteService.eliminarReportes(usuario.idFirebase,authentication)
+        rutinaService.eliminarTodasRutinasDelusuario(usuario.idFirebase,authentication)
+        eliminarDeFirestore(usuario.idFirebase)
+        eliminarDeMongoDb(correo)
+        if(estado){
+            emailService.enviarCorreoNotificacion(
+                usuario.correo,
+                "Cuenta eliminada de rutify",
+                "su cuenta a sido eliminada el dia ${LocalDate.now()}, lamentamos que te hayas despedido de nosotros"
+            )
+        }else{
+            emailService.enviarCorreoNotificacion(
+                usuario.correo,
+                "Cuenta eliminada de rutify",
+                "su cuenta a sido eliminada el dia ${LocalDate.now()}, por reportes negativos de usuarios"
+            )
+        }
+
         return ResponseEntity.noContent().build()
     }
 
@@ -293,5 +315,7 @@ class UsuariosService(
         return ResponseEntity.ok().build()
     }
 
-
+    fun findByReportesGreaterThanOrderByReportesAsc(): List<Usuario> {
+        return usuarioRepository.findByReportesGreaterThanOrderByReportesAsc()
+    }
 }

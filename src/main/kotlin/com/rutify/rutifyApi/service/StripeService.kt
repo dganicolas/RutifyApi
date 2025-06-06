@@ -1,17 +1,13 @@
 package com.rutify.rutifyApi.service
 
 import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.rutify.rutifyApi.dto.PaymentRequestDto
 import com.rutify.rutifyApi.dto.PaymentResponse
-import com.rutify.rutifyApi.exception.exceptions.ValidationException
 import com.stripe.exception.SignatureVerificationException
-import com.stripe.model.Event
 import com.stripe.model.PaymentIntent
 import com.stripe.net.Webhook
 import com.stripe.param.PaymentIntentCreateParams
-import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 
@@ -47,7 +43,7 @@ class StripeService(
     fun handleWebhook(payload: String, sigHeader: String, endpointSecret: String): ResponseEntity<String> {
         return try {
             // Verifica la firma del evento
-            val event = Webhook.constructEvent(payload, sigHeader, endpointSecret)
+            Webhook.constructEvent(payload, sigHeader, endpointSecret)
 
             // Parseo manual del payload con Jackson
             val mapper = jacksonObjectMapper()

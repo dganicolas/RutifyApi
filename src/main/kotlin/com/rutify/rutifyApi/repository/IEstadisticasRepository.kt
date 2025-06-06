@@ -6,4 +6,5 @@ import org.springframework.data.mongodb.repository.MongoRepository
 interface IEstadisticasRepository : MongoRepository<Estadisticas, String> {
 
     fun findByIdFirebase(id:String): Estadisticas?
+    fun deleteAllByIdFirebase(idFirebase: String)
 }

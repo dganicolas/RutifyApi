@@ -133,4 +133,13 @@ class RutinaService(
 
         return ResponseEntity.ok(resultado)
     }
+
+    fun eliminarTodasRutinasDelusuario(idFirebase: String, authentication: Authentication) {
+        val usuarioSolicitante = obtenerUsuario(authentication.name)
+        if (idFirebase != authentication.name && usuarioSolicitante.rol != "admin") throw UnauthorizedException("No tienes permiso para aprobar comentarios")
+        val rutinas = obtenerRutinasPorAutor(idFirebase)
+        rutinas.body!!.forEach {
+            eliminarRutina(it.id!!,authentication)
+        }
+    }
 }

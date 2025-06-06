@@ -14,8 +14,8 @@ class ServiceBase( val usuarioRepository: IUsuarioRepository) {
     lateinit var httpClient: HttpClient
     fun obtenerUsuario(idFirebase: String) = usuarioRepository.findByIdFirebase(idFirebase) ?: throw NotFoundException("Usuario no encontrado")
 
-    open fun getFirebaseAuthInstance(): FirebaseAuth = FirebaseAuth.getInstance()
+    fun getFirebaseAuthInstance(): FirebaseAuth = FirebaseAuth.getInstance()
 
-    open fun createHttpClient(): HttpClient = HttpClient.newHttpClient()
+    fun createHttpClient(): HttpClient = HttpClient.newHttpClient()
 
 }

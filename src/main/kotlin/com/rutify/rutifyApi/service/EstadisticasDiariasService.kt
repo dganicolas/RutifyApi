@@ -1,9 +1,11 @@
 package com.rutify.rutifyApi.service
 
 import com.rutify.rutifyApi.domain.EstadisticasDiarias
+import com.rutify.rutifyApi.domain.Usuario
 import com.rutify.rutifyApi.dto.EstadisticasDiariasDto
 import com.rutify.rutifyApi.dto.EstadisticasDiariasPatchDto
 import com.rutify.rutifyApi.exception.exceptions.NotFoundException
+import com.rutify.rutifyApi.exception.exceptions.UnauthorizedException
 import com.rutify.rutifyApi.repository.IEstadisticasDiariasRepository
 import com.rutify.rutifyApi.utils.DTOMapper.estadisticasDiariasToDto
 import org.springframework.http.ResponseEntity
@@ -59,14 +61,17 @@ class EstadisticasDiariasService(
             val todas = estadisticasDiariasRepository.findTop5ByIdFirebase(idFirebase)
 
         val pesos = todas
-            .map { it.pesoCorporal }
-            .take(5) // Más recientes primero
+            .map { it.pesoCorporal } // Más recientes primero
 
         // Rellenar con ceros al principio si hay menos de 5
-        val resultado = List(5 - todas.size) { 0.0 } + pesos
+        val resultado = pesos + List(5 - todas.size) { 0.0 }
 
-        //el punto reversed es necesario, nico del futuro no tocar esto
         return ResponseEntity.ok(resultado.reversed())
+    }
+
+    fun eliminarEstadisticas(idFirebase: String, usuarioSolicitante: Usuario) {
+        if (idFirebase != usuarioSolicitante.idFirebase &&usuarioSolicitante.rol != "admin") throw UnauthorizedException("No tienes permiso para aprobar comentarios")
+        estadisticasDiariasRepository.deleteAllByIdFirebase(idFirebase)
     }
 
 }

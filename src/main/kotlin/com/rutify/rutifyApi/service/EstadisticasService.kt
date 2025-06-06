@@ -7,6 +7,7 @@ import com.rutify.rutifyApi.exception.exceptions.ConflictException
 import com.rutify.rutifyApi.exception.exceptions.NotFoundException
 import com.rutify.rutifyApi.exception.exceptions.UnauthorizedException
 import com.rutify.rutifyApi.repository.IEstadisticasRepository
+import com.rutify.rutifyApi.repository.IUsuarioRepository
 import com.rutify.rutifyApi.utils.DTOMapper
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -15,8 +16,9 @@ import org.springframework.stereotype.Service
 
 @Service
 class EstadisticasService(
-    private val estadisticasRepository: IEstadisticasRepository
-) {
+    private val estadisticasRepository: IEstadisticasRepository,
+    private val usuarioRepository: IUsuarioRepository,
+){
 
     fun crearEstadisticas(estadisticas: Estadisticas, authentication: Authentication): ResponseEntity<EstadisticasDto> {
 
@@ -57,17 +59,19 @@ class EstadisticasService(
         return ResponseEntity.ok(DTOMapper.estadisticasToEstadisticasDto(guardado))
     }
 
-    fun reiniciarEstadisticas(usuarioId: String, authentication: Authentication): ResponseEntity<EstadisticasDto> {
-        TODO("Not yet implemented")
-    }
-
-    fun eliminarEstadisticasPorUsuarioId(usuarioId: String, authentication: Authentication): ResponseEntity<EstadisticasDto> {
-        TODO("Not yet implemented")
+    fun eliminarEstadisticasPorUsuarioId(usuarioId: String, authentication: Authentication) {
+        val usuarioSolicitante = usuarioRepository.findByIdFirebase(authentication.name) ?:throw NotFoundException("usuario no encontrado")
+        if (usuarioId != authentication.name &&usuarioSolicitante.rol != "admin") throw UnauthorizedException("No tienes permiso para aprobar comentarios")
+        estadisticasRepository.deleteAllByIdFirebase(usuarioId)
     }
 
     fun findByIdFirebase(idFirebase: String): Estadisticas? {
         return estadisticasRepository.findByIdFirebase(
             idFirebase
         )
+    }
+
+    fun deleteByIdUsuario(idFirebase: String, authentication: Authentication) {
+        eliminarEstadisticasPorUsuarioId(idFirebase,authentication)
     }
 }

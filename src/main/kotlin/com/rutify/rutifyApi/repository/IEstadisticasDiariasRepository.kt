@@ -6,13 +6,7 @@ import java.time.LocalDate
 
 interface IEstadisticasDiariasRepository : MongoRepository<EstadisticasDiarias, String> {
     fun findByIdFirebaseAndFecha(idFirebase: String, fecha: LocalDate): EstadisticasDiarias?
-
-    fun findByIdFirebaseAndFechaBetween(
-        idFirebase: String,
-        fechaInicio: LocalDate,
-        fechaFin: LocalDate
-    ): List<EstadisticasDiarias>
-
     fun findTop5ByIdFirebase(idFirebase: String): List<EstadisticasDiarias>
+    fun deleteAllByIdFirebase(idFirebase: String)
     fun findTopByIdFirebaseAndFechaBeforeOrderByFechaDesc(idFirebase: String, fecha: LocalDate): EstadisticasDiarias?
 }
