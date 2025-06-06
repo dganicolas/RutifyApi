@@ -27,6 +27,16 @@ repositories {
 	}
 }
 
+tasks.withType<org.springframework.boot.gradle.tasks.bundling.BootWar> {
+	archiveFileName.set("rutify.war")
+	mainClass.set("com.rutify.rutifyApi.RutifyApiApplicationKt")
+	manifest {
+		attributes(
+			"Main-Class" to "com.rutify.rutifyApi.RutifyApiApplicationKt"
+		)
+	}
+}
+
 dependencies {
 	//implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
