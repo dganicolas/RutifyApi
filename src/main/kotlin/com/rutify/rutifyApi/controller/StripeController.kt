@@ -23,12 +23,12 @@ class StripeController(
     fun init() {
         Stripe.apiKey = stripeSecretKey
     }
-
+    //documentado
     @PostMapping
     fun createPaymentIntent(@RequestBody request: PaymentRequestDto): PaymentResponse {
        return stripeService.crearPago(request)
     }
-
+    //documentado
     @PostMapping("/stripe-webhook")
     fun handleStripeWebhook(@RequestBody payload: String, @RequestHeader("Stripe-Signature") sigHeader: String): ResponseEntity<String> {
         return stripeService.handleWebhook(payload,sigHeader,endpointSecret)

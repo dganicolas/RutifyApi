@@ -572,7 +572,7 @@ class RutinaServiceTest{
             rutinaService.eliminarRutina(idRutina, auth)
         }
 
-        assertEquals("Unauthorized (401). No tienes permiso para crear este voto a otro usuario", exception.message)
+        assertEquals("Unauthorized (401). No tienes permiso para eliminar esta rutina", exception.message)
     }
 
     @Test

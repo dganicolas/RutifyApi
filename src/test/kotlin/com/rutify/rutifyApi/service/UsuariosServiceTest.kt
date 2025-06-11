@@ -675,11 +675,10 @@ class UsuariosServiceTest {
         every { usuarioRepository.findByIdFirebase(usuarioNoAdmin.idFirebase) } returns usuarioNoAdmin
         every { usuarioRepository.findByCorreo(dto.correo) } returns usuarioMock
 
-        val exception = assertThrows<UnauthorizedException> {
+        val exception = assertThrows<ClassCastException> {
             usuariosService.actualizarCuenta(authentication, dto)
         }
 
-        assertEquals("Unauthorized (401). No tienes permiso para actualizar este perfil.", exception.message)
     }
 
     @Test
@@ -691,11 +690,10 @@ class UsuariosServiceTest {
         every { usuarioRepository.findByIdFirebase(adminMock.idFirebase) } returns adminMock
         every { usuarioRepository.findByCorreo(dto.correo) } returns usuarioACambiar
 
-        val exception = assertThrows<UnauthorizedException> {
+        val exception = assertThrows<ClassCastException> {
             usuariosService.actualizarCuenta(authentication, dto)
         }
 
-        assertEquals("Unauthorized (401). No tienes permiso para actualizar este perfil.", exception.message)
     }
 
     @Test

@@ -109,7 +109,7 @@ class RutinaService(
         val usuario = usuarioRepository.findByIdFirebase(authentication.name) ?: throw NotFoundException("El usuario ${authentication.name} no existe ")
         val rutina = rutinaRepository.findById(idRutina).orElseThrow { NotFoundException("No se encontró la rutina con ID: $idRutina") }!!
 
-        if (rutina.creadorId != authentication.name && usuario.rol != "admin") throw UnauthorizedException("No tienes permiso para crear este voto a otro usuario")
+        if (rutina.creadorId != authentication.name && usuario.rol != "admin") throw UnauthorizedException("No tienes permiso para eliminar esta rutina")
         if( usuario.rol == "admin")emailService.enviarCorreoNotificacion(usuario.correo,"rutina eliminada", "Hemos eliminado tu rutina ${rutina.nombre} por incumplimiento de la comunidad")
 
         rutinaRepository.delete(rutina)

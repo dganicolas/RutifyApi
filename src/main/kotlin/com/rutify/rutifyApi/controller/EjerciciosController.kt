@@ -13,18 +13,18 @@ class EjerciciosController {
 
     @Autowired
     private lateinit var ejerciciosService: EjerciciosService
-
+    //documentado
     @PostMapping("/crear")
     fun crearEjercicio(@RequestBody ejercicioDTO: EjercicioDTO): ResponseEntity<Ejercicio> {
         return ejerciciosService.crearEjercicio(ejercicioDTO)
     }
-
+    //documentado
     @GetMapping("/retodiario")
     fun obtenerRetoDiario(): ResponseEntity<EjercicioDTO> {
         val ejercicios = ejerciciosService.obtenerRetoDiario()
         return ResponseEntity.ok(ejercicios)
     }
-
+    //documentado
     @GetMapping("/obteneEjercicios")
     fun obtenerEjercicios(
         @RequestParam(required = false) grupoMuscular: String?,

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/v1/reportes")
 class ReportesController(private val reporteService: ReporteService) {
 
+    //documentado 
     @PostMapping("/reportar/{idFirebase}")
     fun reportarUsuario(@PathVariable idFirebase: String,authentication: Authentication): ResponseEntity<String> {
         return reporteService.reportarUsuario(idFirebase,authentication)

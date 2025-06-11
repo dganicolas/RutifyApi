@@ -11,12 +11,13 @@ import org.springframework.web.bind.annotation.*
 class CompraController(
     private val compraService: CompraService
 ) {
+    //documentado
     @GetMapping("/{idUsuario}")
     fun obtenerComprasUsuario(@PathVariable idUsuario: String): ResponseEntity<List<Cosmetico>> {
         val cosmeticos = compraService.obtenerCosmeticosDelUsuario(idUsuario)
         return ResponseEntity.ok(cosmeticos)
     }
-
+    //documentado
     @PostMapping
     fun registrarCompra(@RequestBody compra: Compra): ResponseEntity<String> {
         return compraService.registrarCompra(compra)

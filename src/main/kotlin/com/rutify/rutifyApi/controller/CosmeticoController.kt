@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/v1/cosmeticos")
 class CosmeticoController(private val cosmeticoService: CosmeticoService) {
-
+    //comentado
     @GetMapping
     fun obtenerTodos(): List<Cosmetico> {
         return cosmeticoService.obtenerTodos()

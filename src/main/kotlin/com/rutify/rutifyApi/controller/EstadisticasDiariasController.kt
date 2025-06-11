@@ -15,14 +15,14 @@ class EstadisticasDiariasController {
 
     @Autowired
     private lateinit var estadisticasDiariasService:  EstadisticasDiariasService
-
+    //documentado
     @GetMapping("/ultimosPesos")
     fun obtenerUltimos5Pesos(
         @RequestParam idFirebase: String
     ): ResponseEntity<List<Double>> {
         return estadisticasDiariasService.obtenerUltimos5Pesos(idFirebase)
     }
-
+    //documentado
     @PatchMapping
     fun actualizarEstadisticasDiarias(
         @RequestParam idFirebase: String,
@@ -32,6 +32,7 @@ class EstadisticasDiariasController {
         return estadisticasDiariasService.findByIdFirebaseAndFecha(idFirebase, fecha, patch)
     }
 
+    //documentado
     @GetMapping("/dia")
     fun obtenerEstadisticasDiariasDia(
         @RequestParam idFirebase: String,
