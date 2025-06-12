@@ -18,15 +18,15 @@ object LogUtils {
 
     private fun createFichero(rutaFichero: Path) {
         // Si rutaFichero no existe, creo el sistema de archivos hasta el mismo
-        if (rutaFichero.notExists()) {
-            Files.createFile(rutaFichero)
-        }
+//        if (rutaFichero.notExists()) {
+//            Files.createFile(rutaFichero)
+//        }
     }
     private fun createDirectory(rutaDirectory: Path) {
         // Si rutaFichero no existe, creo el sistema de archivos hasta el mismo
-        if (rutaDirectory.notExists()) {
-            Files.createDirectories(rutaDirectory)
-        }
+//        if (rutaDirectory.notExists()) {
+//            Files.createDirectories(rutaDirectory)
+//        }
     }
 
     fun writeLog(log: Log) {
