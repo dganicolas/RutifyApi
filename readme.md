@@ -1,3 +1,8 @@
+# Documentacion mas actualizada
+[tfg_rutify_nicolas_de_gomar.pdf](tfg_rutify_nicolas_de_gomar.pdf)
+
+
+
 # Rutify
 # App de gimnasio
 
