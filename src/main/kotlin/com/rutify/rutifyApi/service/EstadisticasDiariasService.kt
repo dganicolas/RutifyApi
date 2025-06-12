@@ -66,7 +66,7 @@ class EstadisticasDiariasService(
         // Rellenar con ceros al principio si hay menos de 5
         val resultado = pesos + List(5 - todas.size) { 0.0 }
 
-        return ResponseEntity.ok(resultado.reversed())
+        return ResponseEntity.ok(resultado)
     }
 
     fun eliminarEstadisticas(idFirebase: String, usuarioSolicitante: Usuario) {
