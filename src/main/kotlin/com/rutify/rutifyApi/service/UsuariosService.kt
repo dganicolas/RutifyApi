@@ -236,7 +236,12 @@ class UsuariosService(
         val usuarioACambiar = usuarioRepository.findByCorreo(actualizarUsuarioDTO.correo)
             ?: throw NotFoundException(mensajesService.obtenerMensaje("UsuarioNoEncontrado"))
 
-        if (usuarioSolicitante.rol != "admin" && !usuarioSolicitante.correo.equals(actualizarUsuarioDTO.correo, ignoreCase = true)) {
+        println("ROL del solicitante: ${usuarioSolicitante.rol}")
+        println("CORREO del solicitante: ${usuarioSolicitante.correo}")
+        println("CORREO del DTO a actualizar: ${actualizarUsuarioDTO.correo}")
+
+
+        if (usuarioSolicitante.rol != "admin" && usuarioSolicitante.correo != actualizarUsuarioDTO.correo) {
             throw UnauthorizedException("No tienes permiso para actualizar este perfil.")
         }
         validarActualizarUsuarioDTO(actualizarUsuarioDTO)
