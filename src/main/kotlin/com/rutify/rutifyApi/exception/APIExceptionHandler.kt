@@ -21,7 +21,6 @@ class APIExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     fun handleBadRequest(request: HttpServletRequest, e: Exception) : ErrorRespuesta {
-        LogUtils.writeLog(Log(request.method, request.requestURI, false, HttpStatus.BAD_REQUEST))
         return ErrorRespuesta(e.message!!, request.requestURI)
     }
 
@@ -29,7 +28,6 @@ class APIExceptionHandler {
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ResponseBody
     fun handleUnauthorized(request: HttpServletRequest, e: UnauthorizedException): ErrorRespuesta {
-        LogUtils.writeLog(Log(request.method, request.requestURI, false, HttpStatus.UNAUTHORIZED))
         return ErrorRespuesta(e.message ?: "Unauthorized", request.requestURI)
     }
 
@@ -37,7 +35,6 @@ class APIExceptionHandler {
     @ResponseStatus(HttpStatus.CONFLICT)
     @ResponseBody
     fun handleConflict(request: HttpServletRequest, e: Exception): ErrorRespuesta {
-        LogUtils.writeLog(Log(request.method, request.requestURI, false, HttpStatus.CONFLICT))
         return ErrorRespuesta(e.message ?: "Conflicto detectado.", request.requestURI)
     }
 
@@ -46,7 +43,6 @@ class APIExceptionHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ResponseBody
     fun handleNotFound(request: HttpServletRequest, e: Exception) : ErrorRespuesta {
-        LogUtils.writeLog(Log(request.method, request.requestURI, false, HttpStatus.NOT_FOUND))
         return ErrorRespuesta(e.message!!, request.requestURI)
     }
 
@@ -54,7 +50,6 @@ class APIExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ResponseBody
     fun handleInternalServerError(request: HttpServletRequest, e: Exception) : ErrorRespuesta {
-        LogUtils.writeLog(Log(request.method, request.requestURI, false, HttpStatus.NOT_FOUND))
         return ErrorRespuesta(e.message!!, request.requestURI)
     }
 
@@ -62,7 +57,6 @@ class APIExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ResponseBody
     fun handleGeneric(request: HttpServletRequest, e: Exception) : ErrorRespuesta {
-        LogUtils.writeLog(Log(request.method, request.requestURI, false, HttpStatus.INTERNAL_SERVER_ERROR))
         return ErrorRespuesta(e.message!!, request.requestURI)
     }
 
